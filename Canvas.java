@@ -388,10 +388,17 @@ public class Canvas extends JPanel {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(title));
         ButtonGroup group = new ButtonGroup();
+
+        boolean first = true;
         for (String option : options) {
             JRadioButton radioButton = new JRadioButton(option);
             group.add(radioButton);
             panel.add(radioButton);
+
+            if(first) {
+                radioButton.setSelected(true);
+                first = false;
+            }
         }
         return panel;
     }
