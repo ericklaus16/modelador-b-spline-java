@@ -159,6 +159,81 @@ public class Surface {
         atualizarMatrizes(matriz);
     }
 
+    public void Rotate(double x, double y, double z) {
+        if (x != 0) {
+            this.RotateX(x);
+        }
+        if (y != 0) {
+            this.RotateY(y);
+        }
+        if (z != 0) {
+            this.RotateZ(z);
+        }
+        this.updateReferences();
+    }
+
+    public void RotateX(double deg) {
+		double[][] matriz = {
+                {1, 0, 0, 0},
+                {0, Utils.cos(deg), -Utils.sin(deg), 0},
+                {0, Utils.sin(deg), Utils.cos(deg), 0},
+                {0, 0, 0, 1}
+		};
+
+        this.atualizarMatrizes(matriz);
+    }
+
+    public void RotateY(double deg) {
+        double[][] matriz = {
+                {Utils.cos(deg), 0, Utils.sin(deg), 0},
+                {0, 1, 0, 0},
+                {-Utils.sin(deg), 0, Utils.cos(deg), 0},
+                {0, 0, 0, 1}
+        };
+
+        this.atualizarMatrizes(matriz);
+    }
+
+    public void RotateZ(double deg) {
+        double[][] matriz = {
+                {Utils.cos(deg), -Utils.sin(deg), 0, 0},
+                {Utils.sin(deg), Utils.cos(deg), 0, 0},
+                {0, 0, 1, 0},
+                {0, 0, 0, 1}
+        };
+
+        this.atualizarMatrizes(matriz);
+    }
+
+    public void Scale(double s) {
+        double[][] matriz = {
+                {s, 0, 0, 0},
+                {0, s, 0, 0},
+                {0, 0, s, 0},
+                {0, 0, 0, 1}
+        };
+
+        for (int i = 0; i < this.m; i++) {
+            for (int j = 0; j < this.n; j++) {
+                this.inp[i][j] = Utils.multiplicarMatrizPorPonto(
+                        matriz,
+                        this.inpScaleReference[i][j]
+                );
+            }
+        }
+
+        for (int i = 0; i < this.RESOLUTIONI; i++) {
+            for (int j = 0; j < this.RESOLUTIONJ; j++) {
+                this.outp[i][j] = Utils.multiplicarMatrizPorPonto(
+                        matriz,
+                        this.outpScaleReference[i][j]
+                );
+            }
+        }
+
+        // console.log(this.outp[0][0]);
+    }
+
     public void atualizarMatrizes(double[][] matriz) {
         for (int i = 0; i < this.m; i++) {
             for (int j = 0; j < this.n; j++) {

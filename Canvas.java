@@ -16,11 +16,13 @@ public class Canvas extends JPanel {
     private List<Point2D> pontos;
     private static boolean configOpened = false; // Agora é static para abrir só uma vez globalmente
     private Settings settings;
+    private Surface superficie;
 
-    public Canvas(int width, int height, Settings settings) {
+    public Canvas(int width, int height, Settings settings, Surface superficie) {
         this.width = width;
         this.height = height;
         this.settings = settings;
+        this.superficie = superficie;
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         fillWhite();  // Garante que a tela comece branca
 
@@ -172,15 +174,23 @@ public class Canvas extends JPanel {
 
         // Botão de salvar
         gbc.gridy++;
-        JButton saveButton = new JButton("Salvar");
+        JButton saveButton = new JButton("Atualizar Superfície");
         mainPanel.add(saveButton, gbc);
 
         saveButton.addActionListener(e -> {
             try {
-                Surface superficie = new Surface(settings.m, settings.n, 30, 40);
+                if(settings.m != superficie.m || settings.n != superficie.n) { // A superficie mudou os pontos de controle
+                    int resposta = JOptionPane.showConfirmDialog(configFrame, "Cuidado! Você alterou a matriz de pontos de controle! Isso gerará uma nova superfície.");
+
+                    if (resposta != JOptionPane.YES_OPTION) return;
+
+                    superficie = new Surface(settings.m, settings.n, 30, 40);
+                }
+
                 superficie.settings = settings;
-                System.out.println(settings.m);
-                System.out.println(settings.n);
+                superficie.Translate(settings.transform.x, settings.transform.y, settings.transform.z);
+                superficie.Rotate(settings.rotation.x, settings.rotation.y, settings.rotation.z);
+                superficie.Scale(settings.scale);
 
                 List<Point2D> pontos2D = new ArrayList<Point2D>();
                 Viewport vp = new Viewport(settings.width, settings.height, settings.widthViewport, settings.heightViewport);

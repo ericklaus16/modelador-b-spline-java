@@ -1,3 +1,4 @@
 .idea/
 out/
 modelador-b-spline-java.iml
+*.class
