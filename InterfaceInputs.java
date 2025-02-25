@@ -164,7 +164,7 @@ public class InterfaceInputs {
     }
 
     // Cria botões de rádio
-    public static JPanel createRadioButtonGroup(String title, String... options) {
+    public static JPanel createRadioButtonGroup(String title, Consumer<String> updateValue, String... options) {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(title));
         ButtonGroup group = new ButtonGroup();
@@ -172,11 +172,19 @@ public class InterfaceInputs {
         boolean first = true;
         for (String option : options) {
             JRadioButton radioButton = new JRadioButton(option);
+            radioButton.addActionListener(e -> {
+                JRadioButton source = (JRadioButton) e.getSource();
+                if (source.isSelected()) {
+                    System.out.println(source.getText());
+                    updateValue.accept(source.getText());
+                }
+            });
             group.add(radioButton);
             panel.add(radioButton);
 
             if(first) {
                 radioButton.setSelected(true);
+                updateValue.accept(option); 
                 first = false;
             }
         }

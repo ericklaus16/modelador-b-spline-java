@@ -1,4 +1,4 @@
 public enum SurfaceType {
-    ABERTA,
-    FECHADA
+    Aberta,
+    Fechada
 }

@@ -1,6 +1,6 @@
 public enum Shader {
-    WIREFRAME,
-    CONSTANTE,
-    GOURAUD,
-    PHONG
+    Wireframe,
+    Constante,
+    Gouraud,
+    Phong
 }

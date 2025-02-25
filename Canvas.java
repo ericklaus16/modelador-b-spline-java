@@ -119,7 +119,9 @@ public class Canvas extends JPanel {
 
         // Superfície
         gbc.gridy++;
-        mainPanel.add(InterfaceInputs.createRadioButtonGroup("Superfície", "Aberta", "Fechada"), gbc);
+        mainPanel.add(InterfaceInputs.createRadioButtonGroup("Superfície", 
+        newType -> settings.type = SurfaceType.valueOf(newType),
+        "Aberta", "Fechada"), gbc);
 
         // Transformações
         gbc.gridy++;
@@ -148,7 +150,9 @@ public class Canvas extends JPanel {
 
         // Wireframe
         gbc.gridy++;
-        mainPanel.add(InterfaceInputs.createRadioButtonGroup("Sombreamento", "Wireframe", "Constante", "Gouraud", "Phong"), gbc);
+        mainPanel.add(InterfaceInputs.createRadioButtonGroup("Sombreamento", 
+            newShading -> settings.shader = Shader.valueOf(newShading),    
+    "Wireframe", "Constante", "Gouraud", "Phong"), gbc);
 
         // Cor de Pintura
         gbc.gridy++;

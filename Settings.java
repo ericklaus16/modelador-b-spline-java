@@ -37,8 +37,8 @@ public class Settings {
         this.visibleEdgeColor = Color.BLACK;
         this.notVisibleEdgeColor = Color.RED;
         this.paintColor = Color.GREEN;
-        this.type = SurfaceType.ABERTA;
-        this.shader = Shader.WIREFRAME;
+        this.type = SurfaceType.Aberta;
+        this.shader = Shader.Wireframe;
         this.kar = 0;
         this.kag = 0;
         this.kab = 0;
