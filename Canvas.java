@@ -1,7 +1,6 @@
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.event.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -11,16 +10,12 @@ import java.util.function.Consumer;
 public class Canvas extends JPanel {
     private BufferedImage image;
     JFrame frame;
-    private int width;
-    private int height;
     private List<Point2D> pontos;
-    private static boolean configOpened = false; // Agora é static para abrir só uma vez globalmente
+    private static boolean configOpened = false;
     private Settings settings;
     private Surface superficie;
 
     public Canvas(int width, int height, Settings settings, Surface superficie) {
-        this.width = width;
-        this.height = height;
         this.settings = settings;
         this.superficie = superficie;
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -36,7 +31,7 @@ public class Canvas extends JPanel {
     private void fillWhite() {
         Graphics2D g2d = image.createGraphics();
         g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, width, height);
+        g2d.fillRect(0, 0, settings.width, settings.height);
         g2d.dispose();
     }
 
@@ -46,7 +41,7 @@ public class Canvas extends JPanel {
             for (Point2D point : pontos) {
                 int px = (int) Math.round(point.x);
                 int py = (int) Math.round(point.y);
-                if (px >= 0 && px < width && py >= 0 && py < height) {
+                if (px >= 0 && px < settings.width && py >= 0 && py < settings.height) {
                     image.setRGB(px, py, Color.BLACK.getRGB());
                 }
             }
@@ -162,13 +157,26 @@ public class Canvas extends JPanel {
         // Material
         gbc.gridy++;
         mainPanel.add(new JLabel("Material"), gbc);
-        gbc.gridy++;mainPanel.add(createInputRow("Ka (ambiente)", settings.ka, "Kd (difuso)", settings.kd,
-                newKa -> settings.ka = newKa,
-                newKd -> settings.kd = newKd
+        gbc.gridy++;
+        mainPanel.add(createTripleInputRow("Ka (ambiente):", settings.kar, settings.kag, settings.kab,
+            newR -> settings.kar = newR,
+            newG -> settings.kag = newG,
+            newB -> settings.kab = newB
         ), gbc);
         gbc.gridy++;
-        gbc.gridy++;mainPanel.add(createInputRow("Ks (especular)", settings.ks, "N", settings.kn,
-                newKs -> settings.ks = newKs,
+        mainPanel.add(createTripleInputRow("Kd (difusa):", settings.kdr, settings.kdg, settings.kdb,
+            newR -> settings.kdr = newR,
+            newG -> settings.kdg = newG,
+            newB -> settings.kdb = newB
+        ), gbc);
+        gbc.gridy++;
+        mainPanel.add(createTripleInputRow("Ks (especular):", settings.ksr, settings.ksg, settings.ksb,
+            newR -> settings.ksr = newR,
+            newG -> settings.ksg = newG,
+            newB -> settings.ksb = newB
+        ), gbc);
+        gbc.gridy++;
+        mainPanel.add(createInputRow("N", settings.kn,
                 newKn -> settings.kn = newKn
         ), gbc);
 
@@ -214,19 +222,12 @@ public class Canvas extends JPanel {
     }
 
     // Cria um painel com dois inputs lado a lado e listeners para atualizar valores dinamicamente
-    private static JPanel createInputRow(String label1, Double value1, String label2, Double value2,
-                                         Consumer<Double> updateValue1, Consumer<Double> updateValue2) {
+    private static JPanel createInputRow(String label1, Double value1, Consumer<Double> updateValue1) {
         JPanel panel = new JPanel(new GridLayout(1, 4));
-
         panel.add(new JLabel(label1));
 
         JTextField textField1 = new JTextField(value1.toString(), 5);
         panel.add(textField1);
-
-        panel.add(new JLabel(label2));
-
-        JTextField textField2 = new JTextField(value2.toString(), 5);
-        panel.add(textField2);
 
         // Listeners para atualizar os valores de settings
         textField1.getDocument().addDocumentListener(new DocumentListener() {
@@ -239,20 +240,6 @@ public class Canvas extends JPanel {
             private void update() {
                 try {
                     updateValue1.accept(Double.parseDouble(textField1.getText()));
-                } catch (NumberFormatException ignored) {}
-            }
-        });
-
-        textField2.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { update(); }
-            private void update() {
-                try {
-                    updateValue2.accept(Double.parseDouble(textField2.getText()));
                 } catch (NumberFormatException ignored) {}
             }
         });
@@ -405,7 +392,7 @@ public class Canvas extends JPanel {
 
     public void Show(List<Point2D> pontos, Point3D[][] pontos3D, Settings settings) {
         if(frame == null){
-            frame = new JFrame("Pixel Canvas");
+            frame = new JFrame("Modelador de Superfícies B-Spline");
         }
         repaint();
 

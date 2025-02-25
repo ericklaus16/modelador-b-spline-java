@@ -17,9 +17,9 @@ public class Settings {
     public Color paintColor;
     public SurfaceType type;
     public Shader shader;
-    public double ka;
-    public double kd;
-    public double ks;
+    public double kar, kag, kab;
+    public double kdr, kdg, kdb;
+    public double ksr, ksg, ksb;
     public double kn;
 
     public Settings() {
@@ -39,9 +39,15 @@ public class Settings {
         this.paintColor = Color.GREEN;
         this.type = SurfaceType.ABERTA;
         this.shader = Shader.WIREFRAME;
-        this.ka = 0;
-        this.kd = 0;
-        this.ks = 0;
+        this.kar = 0;
+        this.kag = 0;
+        this.kab = 0;
+        this.kdr = 0;
+        this.kdg = 0;
+        this.kdb = 0;
+        this.ksr = 0;
+        this.ksg = 0;
+        this.ksb = 0;
         this.kn = 0;
     }
 
