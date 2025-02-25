@@ -76,7 +76,7 @@ public class Canvas extends JPanel {
         // Seção Tela
         mainPanel.add(new JLabel("Tela"), gbc);
         gbc.gridy++;
-        mainPanel.add(createIntegerInputRow("W:", settings.width, "H:", settings.height,
+        mainPanel.add(InterfaceInputs.createIntegerInputRow("W:", settings.width, "H:", settings.height,
                 newWidth -> settings.width = newWidth,
                 newHeight -> settings.height = newHeight), gbc);
 
@@ -84,20 +84,20 @@ public class Canvas extends JPanel {
         gbc.gridy++;
         mainPanel.add(new JLabel("Viewport"), gbc);
         gbc.gridy++;
-        mainPanel.add(createIntegerInputRow("W:", settings.widthViewport, "H:", settings.heightViewport,
+        mainPanel.add(InterfaceInputs.createIntegerInputRow("W:", settings.widthViewport, "H:", settings.heightViewport,
                 newWidth -> settings.widthViewport = newWidth,
                 newHeight -> settings.heightViewport = newHeight), gbc);
 
 
         gbc.gridy++;
-        mainPanel.add(createTripleInputRow("Câmera:", settings.cameraPos.x, settings.cameraPos.y, settings.cameraPos.z,
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Câmera:", settings.cameraPos.x, settings.cameraPos.y, settings.cameraPos.z,
                 newX -> settings.cameraPos.x = newX,
                 newY -> settings.cameraPos.y = newY,
                 newZ -> settings.cameraPos.z = newZ
         ), gbc);
 
         gbc.gridy++;
-        mainPanel.add(createTripleInputRow("Ponto Focal:", settings.pontoFocal.x, settings.pontoFocal.y, settings.pontoFocal.z,
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Ponto Focal:", settings.pontoFocal.x, settings.pontoFocal.y, settings.pontoFocal.z,
                 newX -> settings.pontoFocal.x = newX,
                 newY -> settings.pontoFocal.y = newY,
                 newZ -> settings.pontoFocal.z = newZ
@@ -107,24 +107,24 @@ public class Canvas extends JPanel {
         gbc.gridy++;
         mainPanel.add(new JLabel("Cor das Arestas"), gbc);
         gbc.gridy++;
-        mainPanel.add(createColorSelectionRow("Visíveis", "Não visíveis", settings.visibleEdgeColor, settings.notVisibleEdgeColor), gbc);
+        mainPanel.add(InterfaceInputs.createColorSelectionRow("Visíveis", "Não visíveis", settings.visibleEdgeColor, settings.notVisibleEdgeColor), gbc);
 
         // Matriz de Pontos de Controle
         gbc.gridy++;
         mainPanel.add(new JLabel("Matriz de Pontos de Controle"), gbc);
         gbc.gridy++;
-        mainPanel.add(createIntegerInputRow("m:", settings.m, "n:", settings.n,
+        mainPanel.add(InterfaceInputs.createIntegerInputRow("m:", settings.m, "n:", settings.n,
                 newM -> settings.m = newM,
                 newN -> settings.n = newN), gbc);
 
         // Superfície
         gbc.gridy++;
-        mainPanel.add(createRadioButtonGroup("Superfície", "Aberta", "Fechada"), gbc);
+        mainPanel.add(InterfaceInputs.createRadioButtonGroup("Superfície", "Aberta", "Fechada"), gbc);
 
         // Transformações
         gbc.gridy++;
 //        mainPanel.add(new JLabel("Rotação"), gbc);
-        mainPanel.add(createTripleInputRow("Rotação:", settings.rotation.x, settings.rotation.y, settings.rotation.z,
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Rotação:", settings.rotation.x, settings.rotation.y, settings.rotation.z,
                 newX -> settings.rotation.x = newX,
                 newY -> settings.rotation.y = newY,
                 newZ -> settings.rotation.z = newZ
@@ -132,7 +132,7 @@ public class Canvas extends JPanel {
         gbc.gridy++;
 
         gbc.gridy++;
-        mainPanel.add(createTripleInputRow("Translação:", settings.transform.x, settings.transform.y, settings.transform.z,
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Translação:", settings.transform.x, settings.transform.y, settings.transform.z,
                 newX -> settings.transform.x = newX,
                 newY -> settings.transform.y = newY,
                 newZ -> settings.transform.z = newZ
@@ -148,35 +148,35 @@ public class Canvas extends JPanel {
 
         // Wireframe
         gbc.gridy++;
-        mainPanel.add(createRadioButtonGroup("Sombreamento", "Wireframe", "Constante", "Gouraud", "Phong"), gbc);
+        mainPanel.add(InterfaceInputs.createRadioButtonGroup("Sombreamento", "Wireframe", "Constante", "Gouraud", "Phong"), gbc);
 
         // Cor de Pintura
         gbc.gridy++;
-        mainPanel.add(createColorSelectionRow("Cor de Pintura", "", settings.paintColor, null), gbc);
+        mainPanel.add(InterfaceInputs.createColorSelectionRow("Cor de Pintura", "", settings.paintColor, null), gbc);
 
         // Material
         gbc.gridy++;
         mainPanel.add(new JLabel("Material"), gbc);
         gbc.gridy++;
-        mainPanel.add(createTripleInputRow("Ka (ambiente):", settings.kar, settings.kag, settings.kab,
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Ka (ambiente):", settings.kar, settings.kag, settings.kab,
             newR -> settings.kar = newR,
             newG -> settings.kag = newG,
             newB -> settings.kab = newB
         ), gbc);
         gbc.gridy++;
-        mainPanel.add(createTripleInputRow("Kd (difusa):", settings.kdr, settings.kdg, settings.kdb,
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Kd (difusa):", settings.kdr, settings.kdg, settings.kdb,
             newR -> settings.kdr = newR,
             newG -> settings.kdg = newG,
             newB -> settings.kdb = newB
         ), gbc);
         gbc.gridy++;
-        mainPanel.add(createTripleInputRow("Ks (especular):", settings.ksr, settings.ksg, settings.ksb,
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Ks (especular):", settings.ksr, settings.ksg, settings.ksb,
             newR -> settings.ksr = newR,
             newG -> settings.ksg = newG,
             newB -> settings.ksb = newB
         ), gbc);
         gbc.gridy++;
-        mainPanel.add(createInputRow("N", settings.kn,
+        mainPanel.add(InterfaceInputs.createInputRow("N", settings.kn,
                 newKn -> settings.kn = newKn
         ), gbc);
 
@@ -219,175 +219,6 @@ public class Canvas extends JPanel {
         // Adiciona o painel à janela
         configFrame.add(new JScrollPane(mainPanel), BorderLayout.CENTER);
         configFrame.setVisible(true);
-    }
-
-    // Cria um painel com dois inputs lado a lado e listeners para atualizar valores dinamicamente
-    private static JPanel createInputRow(String label1, Double value1, Consumer<Double> updateValue1) {
-        JPanel panel = new JPanel(new GridLayout(1, 4));
-        panel.add(new JLabel(label1));
-
-        JTextField textField1 = new JTextField(value1.toString(), 5);
-        panel.add(textField1);
-
-        // Listeners para atualizar os valores de settings
-        textField1.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { update(); }
-            private void update() {
-                try {
-                    updateValue1.accept(Double.parseDouble(textField1.getText()));
-                } catch (NumberFormatException ignored) {}
-            }
-        });
-
-        return panel;
-    }
-
-    private static JPanel createIntegerInputRow(String label1, Integer value1, String label2, Integer value2, Consumer<Integer> updateValue1, Consumer<Integer> updateValue2) {
-        JPanel panel = new JPanel(new GridLayout(1, 4));
-
-        panel.add(new JLabel(label1));
-
-        JTextField textField1 = new JTextField(value1.toString(), 5);
-        panel.add(textField1);
-
-        panel.add(new JLabel(label2));
-
-        JTextField textField2 = new JTextField(value2.toString(), 5);
-        panel.add(textField2);
-
-        // Listeners para atualizar os valores de settings
-        textField1.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { update(); }
-            private void update() {
-                try {
-                    updateValue1.accept(Integer.parseInt(textField1.getText()));
-                } catch (NumberFormatException ignored) {} // Evita erro enquanto digita
-            }
-        });
-
-        textField2.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { update(); }
-            private void update() {
-                try {
-                    updateValue2.accept(Integer.parseInt(textField2.getText()));
-                } catch (NumberFormatException ignored) {}
-            }
-        });
-
-        return panel;
-    }
-
-    private static JPanel createTripleInputRow(String label1, Double value1, Double value2, Double value3,
-                                               Consumer<Double> updateValue1, Consumer<Double> updateValue2, Consumer<Double> updateValue3) {
-        JPanel panel = new JPanel(new GridLayout(1, 6));
-
-        panel.add(new JLabel(label1));
-
-        JTextField textField1 = new JTextField(value1.toString(), 5);
-        panel.add(textField1);
-
-        JTextField textField2 = new JTextField(value2.toString(), 5);
-        panel.add(textField2);
-
-        JTextField textField3 = new JTextField(value3.toString(), 5);
-        panel.add(textField3);
-
-        // Listeners para atualizar os valores de settings
-        textField1.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { update(); }
-            private void update() {
-                try {
-                    updateValue1.accept(Double.parseDouble(textField1.getText()));
-                } catch (NumberFormatException ignored) {}
-            }
-        });
-
-        textField2.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { update(); }
-            private void update() {
-                try {
-                    updateValue2.accept(Double.parseDouble(textField2.getText()));
-                } catch (NumberFormatException ignored) {}
-            }
-        });
-
-        textField3.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { update(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { update(); }
-            private void update() {
-                try {
-                    updateValue3.accept(Double.parseDouble(textField3.getText()));
-                } catch (NumberFormatException ignored) {}
-            }
-        });
-
-        return panel;
-    }
-
-    // Cria um painel para seleção de cores
-    private static JPanel createColorSelectionRow(String label1, String label2, Color color1, Color color2) {
-        JPanel panel = new JPanel(new GridLayout(1, 4));
-        panel.add(new JLabel(label1));
-        JButton colorButton1 = new JButton();
-        colorButton1.setBackground(color1);
-        panel.add(colorButton1);
-
-        if (label2 != null && color2 != null) {
-            panel.add(new JLabel(label2));
-            JButton colorButton2 = new JButton();
-            colorButton2.setBackground(color2);
-            panel.add(colorButton2);
-        }
-        return panel;
-    }
-
-    // Cria botões de rádio
-    private static JPanel createRadioButtonGroup(String title, String... options) {
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(title));
-        ButtonGroup group = new ButtonGroup();
-
-        boolean first = true;
-        for (String option : options) {
-            JRadioButton radioButton = new JRadioButton(option);
-            group.add(radioButton);
-            panel.add(radioButton);
-
-            if(first) {
-                radioButton.setSelected(true);
-                first = false;
-            }
-        }
-        return panel;
     }
 
     public void Show(List<Point2D> pontos, Point3D[][] pontos3D, Settings settings) {
