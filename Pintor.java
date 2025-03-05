@@ -31,9 +31,9 @@ public class Pintor {
                 double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
 
                 superficie.faces.add(new Face(A, B, C, D, d, i, j, superficie.settings.cameraPos));
-                Point3D o = superficie.faces.getLast().o;
 
                 if (superficie.settings.shader == Shader.Constante){
+                    Point3D o = superficie.faces.getLast().o;
                     Settings settings = superficie.settings;
                     double r = Lightning.Illuminate(superficie.faces.getLast(), settings.ila,
                             settings.lampada.pos, settings.lampada.il, settings.kar,
@@ -47,9 +47,9 @@ public class Pintor {
                             settings.lampada.pos, settings.lampada.il, settings.kab,
                             settings.kdb, settings.ksb, o);
 
-                    System.out.println("R: " + r);
-                    System.out.println("G: " + gr);
-                    System.out.println("B: " + b);
+//                    System.out.println("R: " + r);
+//                    System.out.println("G: " + gr);
+//                    System.out.println("B: " + b);
 
                     // A cor será usada posteriormente para pintura
                     superficie.faces.getLast().corConstante = new Color((float) r / 255, (float) gr / 255, (float) b / 255);
@@ -157,20 +157,21 @@ public class Pintor {
     public static void pintor(Graphics g, List<Point2D> pontos, Surface superficie) {
         renderLines(g, pontos, superficie);
 
-        for (Face face : superficie.faces) {
-            List<Point2D> facePontos = List.of(
-                    pontos.get(face.i * superficie.outp[0].length + face.j),
-                    pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),
-                    pontos.get((face.i + 1) * superficie.outp[0].length + (face.j + 1)),
-                    pontos.get((face.i + 1) * superficie.outp[0].length + face.j)
-            );
+        if(superficie.settings.shader == Shader.Wireframe){
+            polyFill(g, new Color(1f, 1f, 1f, 0f), pontos);
+        } else {
+            for (Face face : superficie.faces) {
+                List<Point2D> facePontos = List.of(
+                        pontos.get(face.i * superficie.outp[0].length + face.j),
+                        pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),
+                        pontos.get((face.i + 1) * superficie.outp[0].length + (face.j + 1)),
+                        pontos.get((face.i + 1) * superficie.outp[0].length + face.j)
+                );
 
-            if(superficie.settings.shader != Shader.Wireframe){
                 polyFill(g, face.corConstante, facePontos);
-            } else {
-                polyFill(g, new Color(1f, 1f, 1f, 0f), facePontos);
             }
         }
+
 
         // Zbuffer
     }
