@@ -12,6 +12,7 @@ public class Surface {
     public Point3D[][] outp;
     public Point3D[][] inpScaleReference;
     public Point3D[][] outpScaleReference;
+    public List<Face> faces = new ArrayList<>();
     public Settings settings = new Settings();
 
     public Surface(int m, int n, int RESOLUTIONI, int RESOLUTIONJ) {
@@ -22,6 +23,7 @@ public class Surface {
         this.outp = new Point3D[RESOLUTIONI][RESOLUTIONJ];
         this.RESOLUTIONI = RESOLUTIONI;
         this.RESOLUTIONJ = RESOLUTIONJ;
+        this.faces = new ArrayList<>();
 
         this.GerarSuperficie();
     }

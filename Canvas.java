@@ -214,7 +214,7 @@ public class Canvas extends JPanel {
                     }
                 }
 
-                Show(pontos2D, superficie.outp, settings);
+                Show(pontos2D, superficie.outp, settings, superficie.faces);
             } catch (NumberFormatException err) {
                 JOptionPane.showMessageDialog(configFrame, "Puta que pariu");
             }
@@ -225,7 +225,7 @@ public class Canvas extends JPanel {
         configFrame.setVisible(true);
     }
 
-    public void Show(List<Point2D> pontos, Point3D[][] pontos3D, Settings settings) {
+    public void Show(List<Point2D> pontos, Point3D[][] pontos3D, Settings settings, List<Face> faces) {
         if(frame == null){
             frame = new JFrame("Modelador de Superfícies B-Spline");
         }
@@ -233,7 +233,7 @@ public class Canvas extends JPanel {
 
         this.updatePoints(pontos);
         Graphics g = this.image.getGraphics();
-        Pintor.pintor(g, pontos3D, pontos, settings, settings.cameraPos);
+        Pintor.pintor(g, pontos3D, pontos, settings, settings.cameraPos, faces);
 
         frame.add(this);
         frame.setSize(settings.width, settings.height);

@@ -9,11 +9,9 @@ public class Pintor {
         g.clearRect(0, 0, width, height);
     }
 
-    public static void renderLines(Graphics g, List<Point2D> pontos, Point3D[][] pontos3D, Point3D cameraPos, Settings settings) {
+    public static void renderLines(Graphics g, List<Point2D> pontos, Point3D[][] pontos3D, Point3D cameraPos, Settings settings, List<Face> faces) {
         int numRows = pontos3D.length;
         int numCols = pontos3D[0].length;
-
-        List<Face> faces = new ArrayList<>();
 
         for (int i = 0; i < numRows - 1; i++) {
             for (int j = 0; j < numCols - 1; j++) {
@@ -126,8 +124,8 @@ public class Pintor {
         }
     }
 
-    public static void pintor(Graphics g, Point3D[][] pontos3D, List<Point2D> pontos, Settings settings, Point3D cameraPos) {
-        renderLines(g, pontos, pontos3D, cameraPos, settings);
+    public static void pintor(Graphics g, Point3D[][] pontos3D, List<Point2D> pontos, Settings settings, Point3D cameraPos, List<Face> faces) {
+        renderLines(g, pontos, pontos3D, cameraPos, settings, faces);
         polyFill(g, pontos);
         // Zbuffer
     }
