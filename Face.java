@@ -19,7 +19,7 @@ public class Face {
         this.arestas = arestas;
     }
 
-    public Face(Point3D A, Point3D B, Point3D C, Point3D D, double d, int i, int j) {
+    public Face(Point3D A, Point3D B, Point3D C, Point3D D, double d, int i, int j, Point3D vrp) {
         this.A = A;
         this.B = B;
         this.C = C;
@@ -27,10 +27,13 @@ public class Face {
         this.d = d;
         this.i = i;
         this.j = j;
+
+        setNormal();
+        setO(vrp);
     }
 
 
-    public Point3D setNormal() {
+    public void setNormal() {
         // Suponha face ABC
 
         Point3D BC = Point3D.subtract(C, B);
@@ -38,13 +41,11 @@ public class Face {
 
         Point3D ABC = Point3D.vetorialProduct(BC, BA);
         normal = Point3D.getNormalizedVector(ABC);
-
-        return normal;
     }
 
-    public Point3D setO(Point3D vrp) {
+    public void setO(Point3D vrp) {
         Point3D O = Point3D.subtract(vrp, centroide);
-        return Point3D.getNormalizedVector(O);
+        o = Point3D.getNormalizedVector(O);
     }
 
 }

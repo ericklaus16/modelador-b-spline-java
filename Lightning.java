@@ -18,6 +18,9 @@ public class Lightning {
         }
 
 //        System.out.println("Total: " + iT);
+        if (iT > 255){
+            iT = 255;
+        }
         return iT;
     }
 

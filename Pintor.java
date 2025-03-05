@@ -30,9 +30,8 @@ public class Pintor {
                 double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
                 double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
 
-                superficie.faces.add(new Face(A, B, C, D, d, i, j));
-                superficie.faces.getLast().normal = superficie.faces.getLast().setNormal();
-                Point3D o = superficie.faces.getLast().o = superficie.faces.getLast().setO(superficie.settings.cameraPos);
+                superficie.faces.add(new Face(A, B, C, D, d, i, j, superficie.settings.cameraPos));
+                Point3D o = superficie.faces.getLast().o;
 
                 if (superficie.settings.shader == Shader.Constante){
                     Settings settings = superficie.settings;
@@ -51,13 +50,16 @@ public class Pintor {
                     System.out.println("R: " + r);
                     System.out.println("G: " + gr);
                     System.out.println("B: " + b);
-                    
+
                     // A cor será usada posteriormente para pintura
-                    superficie.faces.getLast().corConstante = new Color((float) r, (float) gr, (float) b);
+                    superficie.faces.getLast().corConstante = new Color((float) r / 255, (float) gr / 255, (float) b / 255);
                 } else if (superficie.settings.shader == Shader.Gouraud){
-                    // Aaa
+                    // Vetores normais médios unitários nos vértices
+
                 } else if (superficie.settings.shader == Shader.Phong){
-                    // Fuck
+                    // Vetores normais médios unitários nos vértices
+                    // Calcular a iluminação total nos vértices
+
                 } else if (superficie.settings.shader == Shader.Wireframe){
                     // Ordenar faces por profundidade (fundo para frente)
                     superficie.faces.sort((f1, f2) -> Double.compare(f2.d, f1.d));
