@@ -96,7 +96,7 @@ public class Pintor {
         g.drawLine((int) Math.round(p1.x), (int) Math.round(p1.y), (int) Math.round(p2.x), (int) Math.round(p2.y));
     }
 
-    public static void polyFill(Graphics g, List<Point2D> pontos) {
+    public static void polyFill(Graphics g, Color cor, List<Point2D> pontos) {
         int yMin = (int) Math.floor(pontos.stream().mapToDouble(p -> p.y).min().orElse(0));
         int yMax = (int) Math.ceil(pontos.stream().mapToDouble(p -> p.y).max().orElse(0));
 
@@ -135,7 +135,8 @@ public class Pintor {
             }
         }
 
-        g.setColor(new Color(1f, 1f, 1f, 0f));
+        g.setColor(cor);
+
         for (int y = yMin; y <= yMax; y++) {
             List<Double> intersecoes = scanlines.get(y - yMin);
 
@@ -155,7 +156,22 @@ public class Pintor {
 
     public static void pintor(Graphics g, List<Point2D> pontos, Surface superficie) {
         renderLines(g, pontos, superficie);
-        polyFill(g, pontos);
+
+        for (Face face : superficie.faces) {
+            List<Point2D> facePontos = List.of(
+                    pontos.get(face.i * superficie.outp[0].length + face.j),
+                    pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),
+                    pontos.get((face.i + 1) * superficie.outp[0].length + (face.j + 1)),
+                    pontos.get((face.i + 1) * superficie.outp[0].length + face.j)
+            );
+
+            if(superficie.settings.shader != Shader.Wireframe){
+                polyFill(g, face.corConstante, facePontos);
+            } else {
+                polyFill(g, new Color(1f, 1f, 1f, 0f), facePontos);
+            }
+        }
+
         // Zbuffer
     }
 }

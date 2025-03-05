@@ -104,10 +104,10 @@ public class Canvas extends JPanel {
         ), gbc);
 
         // Cores das Arestas
-        gbc.gridy++;
-        mainPanel.add(new JLabel("Cor das Arestas"), gbc);
-        gbc.gridy++;
-        mainPanel.add(InterfaceInputs.createColorSelectionRow("Visíveis", "Não visíveis", settings.visibleEdgeColor, settings.notVisibleEdgeColor), gbc);
+//        gbc.gridy++;
+//        mainPanel.add(new JLabel("Cor das Arestas"), gbc);
+//        gbc.gridy++;
+//        mainPanel.add(InterfaceInputs.createColorSelectionRow("Visíveis", "Não visíveis", settings.visibleEdgeColor, settings.notVisibleEdgeColor), gbc);
 
         // Matriz de Pontos de Controle
         gbc.gridy++;
@@ -155,8 +155,8 @@ public class Canvas extends JPanel {
     "Wireframe", "Constante", "Gouraud", "Phong"), gbc);
 
         // Cor de Pintura
-        gbc.gridy++;
-        mainPanel.add(InterfaceInputs.createColorSelectionRow("Cor de Pintura", "", settings.paintColor, null), gbc);
+//        gbc.gridy++;
+//        mainPanel.add(InterfaceInputs.createColorSelectionRow("Cor de Pintura", "", settings.paintColor, null), gbc);
 
         // Luz Ambiente
         gbc.gridy++;
