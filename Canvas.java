@@ -158,6 +158,28 @@ public class Canvas extends JPanel {
         gbc.gridy++;
         mainPanel.add(InterfaceInputs.createColorSelectionRow("Cor de Pintura", "", settings.paintColor, null), gbc);
 
+        // Luz Ambiente
+        gbc.gridy++;
+        mainPanel.add(new JLabel("Propriedade dos Materiais e das Luzes"), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createInputRow("Luz Ambiente", settings.ila,
+                newIla -> settings.ila = newIla
+        ), gbc);
+
+        // Lâmpada
+        gbc.gridy++;
+        mainPanel.add(new JLabel("Lâmpada"), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createInputRow("Il", settings.lampada.il,
+                newIl -> settings.lampada.il = newIl
+        ), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createTripleInputRow("XYZ", settings.lampada.pos.x, settings.lampada.pos.y, settings.lampada.pos.z,
+                newX -> settings.lampada.pos.x = newX,
+                newY -> settings.lampada.pos.y = newY,
+                newZ -> settings.lampada.pos.z = newZ
+        ), gbc);
+
         // Material
         gbc.gridy++;
         mainPanel.add(new JLabel("Material"), gbc);
@@ -200,6 +222,8 @@ public class Canvas extends JPanel {
                 }
 
                 superficie.settings = settings;
+
+                // Transformações geométricas (rotações, translações, escalas aplicada ao objeto).
                 superficie.Translate(settings.transform.x, settings.transform.y, settings.transform.z);
                 superficie.Rotate(settings.rotation.x, settings.rotation.y, settings.rotation.z);
                 superficie.Scale(settings.scale);
@@ -214,7 +238,7 @@ public class Canvas extends JPanel {
                     }
                 }
 
-                Show(pontos2D, superficie.outp, settings, superficie.faces);
+                Show(pontos2D, superficie);
             } catch (NumberFormatException err) {
                 JOptionPane.showMessageDialog(configFrame, "Puta que pariu");
             }
@@ -225,7 +249,7 @@ public class Canvas extends JPanel {
         configFrame.setVisible(true);
     }
 
-    public void Show(List<Point2D> pontos, Point3D[][] pontos3D, Settings settings, List<Face> faces) {
+    public void Show(List<Point2D> pontos, Surface superficie) {
         if(frame == null){
             frame = new JFrame("Modelador de Superfícies B-Spline");
         }
@@ -233,7 +257,7 @@ public class Canvas extends JPanel {
 
         this.updatePoints(pontos);
         Graphics g = this.image.getGraphics();
-        Pintor.pintor(g, pontos3D, pontos, settings, settings.cameraPos, faces);
+        Pintor.pintor(g, pontos, superficie);
 
         frame.add(this);
         frame.setSize(settings.width, settings.height);

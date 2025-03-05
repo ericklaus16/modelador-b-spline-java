@@ -9,18 +9,17 @@ public class Pintor {
         g.clearRect(0, 0, width, height);
     }
 
-    public static void renderLines(Graphics g, List<Point2D> pontos, Point3D[][] pontos3D, Point3D cameraPos, Settings settings, List<Face> faces) {
-        int numRows = pontos3D.length;
-        int numCols = pontos3D[0].length;
+    public static void renderLines(Graphics g, List<Point2D> pontos, Surface superficie) {
+        int numRows = superficie.outp.length;
+        int numCols = superficie.outp[0].length;
 
         for (int i = 0; i < numRows - 1; i++) {
             for (int j = 0; j < numCols - 1; j++) {
-                Point3D A = pontos3D[i][j];
-                Point3D B = pontos3D[i][j + 1];
-                Point3D C = pontos3D[i + 1][j + 1];
-                Point3D D = pontos3D[i + 1][j];
+                Point3D A = superficie.outp[i][j];
+                Point3D B = superficie.outp[i][j + 1];
+                Point3D C = superficie.outp[i + 1][j + 1];
+                Point3D D = superficie.outp[i + 1][j];
 
-                // Calcular profundidade média
                 Point3D centroide = new Point3D(
                     (A.x + B.x + C.x + D.x) / 4,
                     (A.y + B.y + C.y + D.y) / 4,
@@ -31,35 +30,63 @@ public class Pintor {
                 double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
                 double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
 
-                faces.add(new Face(A, B, C, D, d, i, j));
+                superficie.faces.add(new Face(A, B, C, D, d, i, j));
+                superficie.faces.getLast().normal = superficie.faces.getLast().setNormal();
+                Point3D o = superficie.faces.getLast().o = superficie.faces.getLast().setO(superficie.settings.cameraPos);
+
+                if (superficie.settings.shader == Shader.Constante){
+                    Settings settings = superficie.settings;
+                    double r = Lightning.Illuminate(superficie.faces.getLast(), settings.ila,
+                            settings.lampada.pos, settings.lampada.il, settings.kar,
+                            settings.kdr, settings.ksr, o);
+
+                    double gr = Lightning.Illuminate(superficie.faces.getLast(), settings.ila,
+                            settings.lampada.pos, settings.lampada.il, settings.kag,
+                            settings.kdg, settings.ksg, o);
+
+                    double b = Lightning.Illuminate(superficie.faces.getLast(), settings.ila,
+                            settings.lampada.pos, settings.lampada.il, settings.kab,
+                            settings.kdb, settings.ksb, o);
+
+                    System.out.println("R: " + r);
+                    System.out.println("G: " + gr);
+                    System.out.println("B: " + b);
+                    
+                    // A cor será usada posteriormente para pintura
+                    superficie.faces.getLast().corConstante = new Color((float) r, (float) gr, (float) b);
+                } else if (superficie.settings.shader == Shader.Gouraud){
+                    // Aaa
+                } else if (superficie.settings.shader == Shader.Phong){
+                    // Fuck
+                } else if (superficie.settings.shader == Shader.Wireframe){
+                    // Ordenar faces por profundidade (fundo para frente)
+                    superficie.faces.sort((f1, f2) -> Double.compare(f2.d, f1.d));
+
+                    // Desenhar as faces na ordem correta
+                    for (Face face : superficie.faces) {
+                        Point3D verticeA = face.A;
+                        Point3D verticeB = face.B;
+                        Point3D verticeC = face.C;
+                        Point3D verticeD = face.D;
+
+                        // Calcular visibilidade
+                        double visibility = Visibility.VisibilidadeNormal(superficie.settings.cameraPos, verticeD, verticeC, verticeB, verticeA);
+
+                        Color edgeColor = visibility > 0 ? superficie.settings.visibleEdgeColor : superficie.settings.notVisibleEdgeColor;
+                        g.setColor(edgeColor);
+
+                        Point2D A2D = pontos.get(face.i * numCols + face.j);
+                        Point2D B2D = pontos.get(face.i * numCols + (face.j + 1));
+                        Point2D C2D = pontos.get((face.i + 1) * numCols + (face.j + 1));
+                        Point2D D2D = pontos.get((face.i + 1) * numCols + face.j);
+
+                        drawLine(g, A2D, B2D);
+                        drawLine(g, B2D, C2D);
+                        drawLine(g, C2D, D2D);
+                        drawLine(g, D2D, A2D);
+                    }
+                }
             }
-        }
-
-        // Ordenar faces por profundidade (fundo para frente)
-        faces.sort((f1, f2) -> Double.compare(f2.d, f1.d));
-
-        // Desenhar as faces na ordem correta
-        for (Face face : faces) {
-            Point3D A = face.A;
-            Point3D B = face.B;
-            Point3D C = face.C;
-            Point3D D = face.D;
-
-            // Calcular visibilidade
-            double visibility = Visibility.VisibilidadeNormal(cameraPos, D, C, B, A);
-
-            Color edgeColor = visibility > 0 ? settings.visibleEdgeColor : settings.notVisibleEdgeColor;
-            g.setColor(edgeColor);
-
-            Point2D A2D = pontos.get(face.i * numCols + face.j);
-            Point2D B2D = pontos.get(face.i * numCols + (face.j + 1));
-            Point2D C2D = pontos.get((face.i + 1) * numCols + (face.j + 1));
-            Point2D D2D = pontos.get((face.i + 1) * numCols + face.j);
-
-            drawLine(g, A2D, B2D);
-            drawLine(g, B2D, C2D);
-            drawLine(g, C2D, D2D);
-            drawLine(g, D2D, A2D);
         }
     }
 
@@ -124,8 +151,8 @@ public class Pintor {
         }
     }
 
-    public static void pintor(Graphics g, Point3D[][] pontos3D, List<Point2D> pontos, Settings settings, Point3D cameraPos, List<Face> faces) {
-        renderLines(g, pontos, pontos3D, cameraPos, settings, faces);
+    public static void pintor(Graphics g, List<Point2D> pontos, Surface superficie) {
+        renderLines(g, pontos, superficie);
         polyFill(g, pontos);
         // Zbuffer
     }
