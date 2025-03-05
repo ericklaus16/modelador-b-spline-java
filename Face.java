@@ -13,7 +13,7 @@ public class Face {
     public Point3D centroide = new Point3D(0, 0, 0);
     public Point3D normal = new Point3D(0, 0, 0);
     public Point3D o = new Point3D(0, 0, 0);
-    public Color corConstante = new Color(0, 0, 0);
+    public Color corConstante = Color.black;
 
     public Face(List<Aresta> arestas) {
         this.arestas = arestas;
