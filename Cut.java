@@ -27,10 +27,8 @@ public class Cut {
 
         if (x < umin) {
             code |= LEFT;
-            System.out.print("1");
         } else if (x > umax) {
             code |= RIGHT;
-            System.out.print("2");
         }
         if (y < vmin) {
             code |= BOTTOM;
@@ -43,7 +41,7 @@ public class Cut {
     
     public void teste(double x1, double y1, double z1, double r1, double g1, double b1, 
                       double x2, double y2,  double z2,  double r2,  double g2,  double b2) {
-        System.out.println("Teste\n");
+        System.out.println("\n");
         int code1 = computeCode(x1, y1);
         int code2 = computeCode(x2, y2);
 
@@ -111,7 +109,7 @@ public class Cut {
                 r1 = r;
                 g1 = g;
                 b1 = b;
-                System.out.println("Aresta aceita: (x1: " + x1 + ", y1: " + y1 + ", z1: " + z1 + ", r1: " + r1 + ", g1: " + g1 + ", b1: " + b1 + ")");
+                System.out.printf("Aresta aceita: (x1: %.3f, y1: %.3f, z1: %.3f, r1: %.3f, g1: %.3f, b1: %.3f)%n", x1, y1, z1, r1, g1, b1);
             } else {
                 x2 = x;
                 y2 = y;
@@ -119,7 +117,7 @@ public class Cut {
                 r2 = r;
                 g2 = g;
                 b2 = b;
-                System.out.println("Aresta aceita: (x2: " + x2 + ", y2: " + y2 + ", z2: " + z2 + ", r2: " + r2 + ", g2: " + g2 + ", b2: " + b2 + ")");
+                System.out.printf("Aresta aceita: (x2: %.3f, y2: %.3f, z2: %.3f, r2: %.3f, g2: %.3f, b2: %.3f)%n", x2, y2, z2, r2, g2, b2);
             }
         }
     }
