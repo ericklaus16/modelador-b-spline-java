@@ -56,7 +56,7 @@ public class Cut {
         } else {
             // Pelo menos um ponto está fora da janela
             int codeOut = 0;
-            double x = 0, y = 0;
+            double x = 0, y = 0, z = 0, r = 0, g = 0, b = 0;
 
             // Escolhe o ponto fora da janela
             if (code1 != 0) {
@@ -68,33 +68,57 @@ public class Cut {
             if ((codeOut & LEFT) != 0) { // O ponto está à esquerda
                 double u = (umin - x1) / (x2 - x1);
                 System.out.println("Recorte na coordenada X Esq");
-                y = (y1 + u * (y2 - y1));
                 x = umin;
+                y = (y1 + u * (y2 - y1));
+                z = (z1 + u * (z2 - z1));
+                r = (r1 + u * (r2 - r1));
+                g = (g1 + u * (g2 - g1));
+                b = (b1 + u * (b2 - b1));
             } else if ((codeOut & RIGHT) != 0) { // O ponto está à direita
                 double u = (umax - x1) / (x2 - x1);
                 System.out.println("Recorte na coordenada X Dir");
-                y = (y1 + u * (y2 - y1));
                 x = umax;
+                y = (y1 + u * (y2 - y1));
+                z = (z1 + u * (z2 - z1));
+                r = (r1 + u * (r2 - r1));
+                g = (g1 + u * (g2 - g1));
+                b = (b1 + u * (b2 - b1));
             } else if ((codeOut & BOTTOM) != 0) { // O ponto está abaixo
                 double u = (vmin - y1) / (y2 - y1);
                 System.out.println("Recorte na coordenada Y Bot");
-                x = x1 + u * (x2 - x1);
                 y = vmin;
+                x = x1 + u * (x2 - x1);
+                z = (z1 + u * (z2 - z1));
+                r = (r1 + u * (r2 - r1));
+                g = (g1 + u * (g2 - g1));
+                b = (b1 + u * (b2 - b1));
             } else if ((codeOut & TOP) != 0) { // O ponto está acima
                 double u = (vmax - y1) / (y2 - y1);
                 System.out.println("Recorte na coordenada Y Top");
-                x = x1 + u * (x2 - x1);
                 y = vmax;
+                x = x1 + u * (x2 - x1);
+                z = (z1 + u * (z2 - z1));
+                r = (r1 + u * (r2 - r1));
+                g = (g1 + u * (g2 - g1));
+                b = (b1 + u * (b2 - b1));
             }
 
             // Atualiza o ponto fora da janela
             if (codeOut == code1) {
                 x1 = x;
                 y1 = y;
+                z1 = z;
+                r1 = r;
+                g1 = g;
+                b1 = b;
                 System.out.println("Aresta aceita: (x1: " + x1 + ", y1: " + y1 + ", z1: " + z1 + ", r1: " + r1 + ", g1: " + g1 + ", b1: " + b1 + ")");
             } else {
                 x2 = x;
                 y2 = y;
+                z2 = z;
+                r2 = r;
+                g2 = g;
+                b2 = b;
                 System.out.println("Aresta aceita: (x2: " + x2 + ", y2: " + y2 + ", z2: " + z2 + ", r2: " + r2 + ", g2: " + g2 + ", b2: " + b2 + ")");
             }
         }
