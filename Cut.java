@@ -1,6 +1,12 @@
 public class Cut {
     public double umin, umax, vmin, vmax;
 
+    static final int INSIDE = 0; // 0000
+    static final int LEFT = 1;   // 0001
+    static final int RIGHT = 2;  // 0010
+    static final int BOTTOM = 4; // 0100
+    static final int TOP = 8;    // 1000
+    
 //    public void Cut(Viewport vp) {
 //        double umin = vp.umin;
 //        double umax = vp.umax;
@@ -15,95 +21,96 @@ public class Cut {
         this.vmax = vmax;
     }
 
-    private boolean dentro(double x, double y) {
-        return x >= umin && x <= umax && y >= vmin && y <= vmax;
-    }
-    
-    private boolean dentroMinX(double x) {
-        return !(x >= umin);
-    }
-    
-    private boolean dentroMinY(double y) {
-        return !(y >= vmin);
-    }
-    
-    private boolean dentroMaxX(double x) {
-        return !(x <= umax);
-    }
-    
-    private boolean dentroMaxY(double y) {
-        return !(y <= vmax);
-    }
+    // Método para calcular o código de região
+    int computeCode(double x, double y) {
+        int code = INSIDE;
 
-    public void recortar(int x1, int y1, int x2, int y2) {
-        if (dentro(x1, y1) && dentro(x2, y2)) {
-            System.out.println("Segmento totalmente dentro: (" + x1 + ", " + y1 + ") -> (" + x2 + ", " + y2 + ")");
-        } else {
-            System.out.println("Segmento fora ou parcialmente dentro (não implementado o algoritmo completo)");
+        if (x < umin) {
+            code |= LEFT;
+            System.out.print("1");
+        } else if (x > umax) {
+            code |= RIGHT;
+            System.out.print("2");
         }
+        if (y < vmin) {
+            code |= BOTTOM;
+        } else if (y > vmax) {
+            code |= TOP;
+        }
+
+        return code;
     }
     
-    public void teste(double x1, double y1, double x2, double y2) {
-        System.out.println("Teste");
-        if (dentroMinX(x1) || dentroMinX(x2)) { 
-            double u = (umin - x1) / (x2 - x1);
+    public void teste(double x1, double y1, double z1, double r1, double g1, double b1, 
+                      double x2, double y2,  double z2,  double r2,  double g2,  double b2) {
+        System.out.println("Teste\n");
+        int code1 = computeCode(x1, y1);
+        int code2 = computeCode(x2, y2);
 
-            System.out.println("Recorte na coordenada X (algum ponto menor que Xmin)");
-            if (dentroMinX(x1)) { // x1 < umin
-                x1 = umin;
-            } else if (dentroMinX(x2)) { // x2 < umin
-                x2 = umin;
-            }
-            double y = (y1 + u * (y2 - y1));
-            System.out.println("Ponto de corte: (x1: " + x1 + " x2: " + x2 + ", " + y + ")");
-        } else if (dentroMaxX(x1) || dentroMaxX(x2)) {
-            double u = (umax - x1) / (x2 - x1);
+        if ((code1 == 0) && (code2 == 0)) {
+            // Ambos os pontos estão dentro da janela
+            System.out.println("Aresta aceita: (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ")");
+        } else if ((code1 & code2) != 0) {
+            // Ambos os pontos estão fora da janela, na mesma região
+            System.out.println("Aresta rejeitada");
+        } else {
+            // Pelo menos um ponto está fora da janela
+            int codeOut = 0;
+            double x = 0, y = 0;
 
-            System.out.println("Recorte na coordenada X (algum ponto maior que Xmax)");
-            if (dentroMaxX(x1)) { // x1 > umax
-                x1 = umax;
-            } else if (dentroMaxX(x2)) { // x2 > umax
-                x2 = umax;
+            // Escolhe o ponto fora da janela
+            if (code1 != 0) {
+                codeOut = code1;
+            }else if (code2 != 0) {
+                codeOut = code2;
             }
-            double y = (y1 + u * (y2 - y1));
-            System.out.println("Ponto de corte: (x1: " + x1 + " x2: " + x2 + ", " + y + ")");
-        } else if (dentroMinY(y1) || dentroMinY(y2)) {
-            double u = (vmin - y1) / (y2 - y1);
 
-            System.out.println("Recorte na coordenada Y (algum ponto menor que Ymin)");
-            if (dentroMinY(y1)) { // y1 < vmin
-                y1 = vmin;
-            } else if (dentroMinY(y2)) { // y2 < vmin
-                y2 = vmin;
+            if ((codeOut & LEFT) != 0) { // O ponto está à esquerda
+                double u = (umin - x1) / (x2 - x1);
+                System.out.println("Recorte na coordenada X Esq");
+                y = (y1 + u * (y2 - y1));
+                x = umin;
+            } else if ((codeOut & RIGHT) != 0) { // O ponto está à direita
+                double u = (umax - x1) / (x2 - x1);
+                System.out.println("Recorte na coordenada X Dir");
+                y = (y1 + u * (y2 - y1));
+                x = umax;
+            } else if ((codeOut & BOTTOM) != 0) { // O ponto está abaixo
+                double u = (vmin - y1) / (y2 - y1);
+                System.out.println("Recorte na coordenada Y Bot");
+                x = x1 + u * (x2 - x1);
+                y = vmin;
+            } else if ((codeOut & TOP) != 0) { // O ponto está acima
+                double u = (vmax - y1) / (y2 - y1);
+                System.out.println("Recorte na coordenada Y Top");
+                x = x1 + u * (x2 - x1);
+                y = vmax;
             }
-            double x = x1 + u * (x2 - x1);
-            System.out.println("Ponto de corte: (" + x + ", " + " y1: " + y1 + " y2: " + y2 + ")");
-        } else if (dentroMaxY(y1) || dentroMaxY(y2)) {
-            double u = (vmax - y1) / (y2 - y1);
 
-            System.out.println("Recorte na coordenada Y (algum ponto maior que Ymax)");
-            if (dentroMaxY(y1)) { // y1 > vmax
-                y1 = vmax;
-            } else if (dentroMaxY(y2)) { // y2 > vmax
-                y2 = vmax;
+            // Atualiza o ponto fora da janela
+            if (codeOut == code1) {
+                x1 = x;
+                y1 = y;
+                System.out.println("Aresta aceita: (x1: " + x1 + ", y1: " + y1 + ", z1: " + z1 + ", r1: " + r1 + ", g1: " + g1 + ", b1: " + b1 + ")");
+            } else {
+                x2 = x;
+                y2 = y;
+                System.out.println("Aresta aceita: (x2: " + x2 + ", y2: " + y2 + ", z2: " + z2 + ", r2: " + r2 + ", g2: " + g2 + ", b2: " + b2 + ")");
             }
-            double x = x1 + u * (x2 - x1);
-            System.out.println("Ponto de corte: (" + x + ", " + " y1: " + y1 + " y2: " + y2 + ")");
         }
     }
 
     public static void main(String[] args) {
         Cut recorte = new Cut(100, 400, 80, 380);
-//        recorte.recortar(480, 0, 0, 250); // U = 0.791 baseado na planilha Adair
-        
-        System.out.print("/n");
-        recorte.teste(0.0, 250.0, 250.0, 430.0); // AB cortando A'
-        recorte.teste(480.0, 0.0, 0.0, 250.0); // CA cortando A""
-        recorte.teste(250.0, 430.0, 480.0, 0.0); // BC cortando C'
-        recorte.teste(480.0, 0.0, 100.0, 197.917); // CA" cortando C"
-        recorte.teste(250.0, 430.0, 400.0, 149.565); // BC' cortando B'
-        recorte.teste(100.0, 322.0, 250.0, 430.0); // A'B cortando B"
-        recorte.teste(400.0, 149.565, 400.0, 41.667); // C'C" cortando C'''
-        recorte.teste(400.0, 41.667, 100.0, 197.917); // C"A" cortando C''''
+
+        System.out.print("Inicio dos testes\n");
+        recorte.teste(0.0, 250.0, -30.0, 200.0, 120.0, 30.0, 250.0, 430.0, -65.0, 40.0, 250.0, 100.0); // AB cortando A'
+        recorte.teste(480.0, 0.0, -90.0, 100.0, 10.0, 190.0, 0.0, 250.0, -30.0, 200.0, 120.0, 30.0); // CA cortando A""
+        recorte.teste(250.0, 430.0, -65.0, 40.0, 250.0, 100.0, 480.0, 0.0, -90.0, 100.0, 10.0, 190.0); // BC cortando C'
+        recorte.teste(480.0, 0.0, -90.0, 100.0, 10.0, 190.0, 100.0, 197.917, -42.500, 179.167, 97.083, 63.333); // CA" cortando C"
+        recorte.teste(250.0, 430.0, -65.0, 40.0, 250.0, 100.0, 400.0, 149.565, -81.304, 79.130, 93.478, 158.696); // BC' cortando B'
+        recorte.teste(100.0, 322.0, -44.0, 136.0, 172.0, 58.0, 250.0, 430.0, -65.0, 40.0, 250.0, 100.0); // A'B cortando B"
+        recorte.teste(400.0, 149.565, -81.304, 79.130, 93.478, 158.696, 400.0, 41.667, -80.0, 116.667, 28.333, 163.333); // C'C" cortando C'''
+        recorte.teste(400.0, 41.667, -80.0, 116.667, 28.333, 163.333, 100.0, 197.917, -42.500, 179.167, 97.083, 63.333); // C"A" cortando C''''
     }
 }
