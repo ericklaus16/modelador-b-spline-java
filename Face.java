@@ -7,6 +7,7 @@ public class Face {
     public Point3D C;
     public Point3D D;
     public double d;
+    public double visibilidade = 0;
     public int i;
     public int j;
     public List<Aresta> arestas;
@@ -15,9 +16,11 @@ public class Face {
     public Point3D o = new Point3D(0, 0, 0);
     public Color corConstante = Color.black;
 
-    public Face(List<Aresta> arestas) {
-        this.arestas = arestas;
-    }
+    // Cores para Gourard
+    public Color corVerticeA = Color.black;
+    public Color corVerticeB = Color.black;
+    public Color corVerticeC = Color.black;
+    public Color corVerticeD = Color.black;
 
     public Face(Point3D A, Point3D B, Point3D C, Point3D D, double d, int i, int j, Point3D vrp) {
         this.A = A;
@@ -30,6 +33,7 @@ public class Face {
 
         setNormal();
         setO(vrp);
+        setVisibility(vrp);
     }
 
 
@@ -46,6 +50,13 @@ public class Face {
     public void setO(Point3D vrp) {
         Point3D O = Point3D.subtract(vrp, centroide);
         o = Point3D.getNormalizedVector(O);
+    }
+
+    public void setVisibility(Point3D vrp){
+
+        // Calcular visibilidade
+        visibilidade = Visibility.VisibilidadeNormal(vrp, D, C, B, A);
+
     }
 
 }

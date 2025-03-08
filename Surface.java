@@ -1,5 +1,8 @@
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Surface {
     public Integer id;
@@ -14,6 +17,7 @@ public class Surface {
     public Point3D[][] outpScaleReference;
     public List<Face> faces = new ArrayList<>();
     public Settings settings = new Settings();
+    public Map<Point3D, Color> vertexColors = new HashMap<>();
 
     public Surface(int m, int n, int RESOLUTIONI, int RESOLUTIONJ) {
         this.name = "";

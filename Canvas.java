@@ -1,11 +1,10 @@
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
 
 public class Canvas extends JPanel {
     private BufferedImage image;
@@ -14,6 +13,84 @@ public class Canvas extends JPanel {
     private static boolean configOpened = false;
     private Settings settings;
     private Surface superficie;
+
+    private JFrame surfacesFrame;
+    private JPanel surfacesPanel;
+    private JFrame configFrame;
+    private int surfaceCounter = 1;
+    private Map<String, Surface> surfaceMap = new HashMap<>();
+    private Map<String, Settings> settingsMap = new HashMap<>();
+
+    public void openSurfaceManager() {
+        surfacesFrame = new JFrame("Gerenciador de Superfícies");
+        surfacesFrame.setSize(300, 500);
+        surfacesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        surfacesPanel = new JPanel();
+        surfacesPanel.setLayout(new BoxLayout(surfacesPanel, BoxLayout.Y_AXIS));
+        
+        // Botão para criar uma nova superfície
+        JButton createButton = new JButton("Criar Nova Superfície");
+        createButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        createButton.addActionListener(e -> createNewSurface());
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(createButton);
+        
+        surfacesFrame.add(buttonPanel, BorderLayout.NORTH);
+        surfacesFrame.add(new JScrollPane(surfacesPanel), BorderLayout.CENTER);
+        surfacesFrame.setVisible(true);
+    }
+
+    private void createNewSurface() {
+        String surfaceName = "SUPERFICIE " + surfaceCounter++;
+        
+        // Criar nova configuração e superfície
+        Settings newSettings = new Settings();
+        Surface newSurface = new Surface(newSettings.m, newSettings.n, 30, 40);
+        
+        // Salvar nos mapas
+        settingsMap.put(surfaceName, newSettings);
+        surfaceMap.put(surfaceName, newSurface);
+        
+        // Criar botão para a superfície
+        JButton surfaceButton = new JButton(surfaceName);
+        surfaceButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        surfaceButton.addActionListener(e -> {
+            // Atualizar as referências atuais
+            settings = settingsMap.get(surfaceName);
+            superficie = surfaceMap.get(surfaceName);
+            
+            // Abrir janela de configurações para esta superfície
+            openConfigurationsForSurface(surfaceName);
+        });
+        
+        // Adicionar botão ao painel
+        surfacesPanel.add(surfaceButton);
+        surfacesPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Espaçamento
+        surfacesPanel.revalidate();
+        surfacesPanel.repaint();
+        
+        // Abrir automaticamente as configurações para a nova superfície
+        settings = newSettings;
+        superficie = newSurface;
+        openConfigurationsForSurface(surfaceName);
+    }
+    
+    private void openConfigurationsForSurface(String surfaceName) {
+        if (configFrame != null && configFrame.isVisible()) {
+            // Atualizar a janela de configurações existente
+            updateConfigurationValues();
+        } else {
+            // Criar uma nova janela de configurações se não existir
+            openConfigurations();
+        }
+    }
+
+    private void updateConfigurationValues() {
+        configFrame.dispose();
+        openConfigurations();
+    }
 
     public Canvas(int width, int height, Settings settings, Surface superficie) {
         this.settings = settings;
@@ -24,8 +101,11 @@ public class Canvas extends JPanel {
         // Garantir que a janela de configurações seja aberta apenas uma vez
         if (!configOpened) {
             configOpened = true;
-            SwingUtilities.invokeLater(this::openConfigurations);
         }
+    }
+
+    public void iniciarComGerenciador() {
+        SwingUtilities.invokeLater(this::openSurfaceManager);
     }
 
     private void fillWhite() {
@@ -60,10 +140,15 @@ public class Canvas extends JPanel {
     }
 
     public void openConfigurations() {
-        JFrame configFrame = new JFrame("Configurações");
-        configFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        configFrame.setSize(400, 600);
-        configFrame.setLayout(new BorderLayout());
+        if (configFrame == null || !configFrame.isVisible()) {
+            configFrame = new JFrame("Configurações");
+            configFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            configFrame.setSize(400, 600);
+            configFrame.setLayout(new BorderLayout());
+        } else {
+            // Limpar o conteúdo anterior se a janela já existir
+            configFrame.getContentPane().removeAll();
+        }
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -213,34 +298,83 @@ public class Canvas extends JPanel {
 
         saveButton.addActionListener(e -> {
             try {
-                if(settings.m != superficie.m || settings.n != superficie.n) { // A superficie mudou os pontos de controle
-                    int resposta = JOptionPane.showConfirmDialog(configFrame, "Cuidado! Você alterou a matriz de pontos de controle! Isso gerará uma nova superfície.");
-
-                    if (resposta != JOptionPane.YES_OPTION) return;
-
-                    superficie = new Surface(settings.m, settings.n, 30, 40);
-                }
-
-                superficie.settings = settings;
-
-                // Transformações geométricas (rotações, translações, escalas aplicada ao objeto).
-                superficie.Translate(settings.transform.x, settings.transform.y, settings.transform.z);
-                superficie.Rotate(settings.rotation.x, settings.rotation.y, settings.rotation.z);
-                superficie.Scale(settings.scale);
-
-                List<Point2D> pontos2D = new ArrayList<Point2D>();
-                Viewport vp = new Viewport(settings.width, settings.height, settings.widthViewport, settings.heightViewport);
-
-                for(int i = 0; i < superficie.outp.length; i++){
-                    for(int j = 0; j < superficie.outp[i].length; j++){
-                        Point2D ponto2D = Pipeline.mapearPonto(superficie.outp[i][j], settings.pontoFocal, settings.cameraPos, vp);
-                        pontos2D.add(ponto2D);
+                // Atualizar a superfície atual primeiro
+                String surfaceAtualKey = null;
+                
+                // Encontrar a chave da superfície atual no mapa
+                for (Map.Entry<String, Surface> entry : surfaceMap.entrySet()) {
+                    if (entry.getValue() == superficie) {
+                        surfaceAtualKey = entry.getKey();
+                        break;
                     }
                 }
-
-                Show(pontos2D, superficie);
+                
+                if (surfaceAtualKey != null) {
+                    if(settings.m != superficie.m || settings.n != superficie.n) {
+                        int resposta = JOptionPane.showConfirmDialog(configFrame, 
+                            "Cuidado! Você alterou a matriz de pontos de controle! Isso gerará uma nova superfície.");
+        
+                        if (resposta != JOptionPane.YES_OPTION) return;
+        
+                        // Criar nova superfície com novos pontos de controle
+                        Surface novaSuperf = new Surface(settings.m, settings.n, 30, 40);
+                        superficie = novaSuperf;
+                        
+                        // Atualizar o mapa
+                        surfaceMap.put(surfaceAtualKey, novaSuperf);
+                    }
+                    
+                    // Aplicar configurações à superfície atual
+                    superficie.settings = settings;
+                    settingsMap.put(surfaceAtualKey, settings);
+                }
+                
+                // Preparar o frame para exibição
+                if(frame == null){
+                    frame = new JFrame("Modelador de Superfícies B-Spline");
+                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    frame.setSize(settings.width, settings.height);
+                    frame.add(Canvas.this);
+                    frame.setVisible(true);
+                }
+                
+                // Limpar o canvas antes de desenhar as superfícies
+                fillWhite();
+                
+                // Renderizar cada superfície individualmente
+                for (Map.Entry<String, Surface> entry : surfaceMap.entrySet()) {
+                    Surface superf = entry.getValue();
+                    Settings config = settingsMap.get(entry.getKey());
+                    
+                    // Criar viewport com as configurações atuais
+                    Viewport vp = new Viewport(settings.width, settings.height, 
+                                              settings.widthViewport, settings.heightViewport);
+                    
+                    // Aplicar transformações para a superfície atual
+                    superf.Translate(config.transform.x, config.transform.y, config.transform.z);
+                    superf.Rotate(config.rotation.x, config.rotation.y, config.rotation.z);
+                    superf.Scale(config.scale);
+                    
+                    // Mapear pontos 3D para 2D para ESTA superfície específica
+                    List<Point2D> pontosDaSuperficie = new ArrayList<>();
+                    for(int i = 0; i < superf.outp.length; i++){
+                        for(int j = 0; j < superf.outp[i].length; j++){
+                            Point2D ponto2D = Pipeline.mapearPonto(superf.outp[i][j], 
+                                             config.pontoFocal, config.cameraPos, vp);
+                            pontosDaSuperficie.add(ponto2D);
+                        }
+                    }
+                    
+                    // Renderizar esta superfície específica
+                    Graphics g = image.getGraphics();
+                    Pintor.pintor(g, pontosDaSuperficie, superf);
+                }
+                
+                // Atualizar a exibição
+                repaint();
+                        
             } catch (NumberFormatException err) {
-                JOptionPane.showMessageDialog(configFrame, "Puta que pariu");
+                JOptionPane.showMessageDialog(configFrame, "Erro ao processar valores numéricos");
             }
         });
 
@@ -252,16 +386,15 @@ public class Canvas extends JPanel {
     public void Show(List<Point2D> pontos, Surface superficie) {
         if(frame == null){
             frame = new JFrame("Modelador de Superfícies B-Spline");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(settings.width, settings.height);
+            frame.add(this);
+            frame.setVisible(true);
         }
-        repaint();
 
         this.updatePoints(pontos);
         Graphics g = this.image.getGraphics();
         Pintor.pintor(g, pontos, superficie);
-
-        frame.add(this);
-        frame.setSize(settings.width, settings.height);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        repaint();
     }
 }
