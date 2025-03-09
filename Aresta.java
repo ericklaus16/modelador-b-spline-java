@@ -1,4 +1,8 @@
-public class Aresta {
+import java.io.Serializable;
+
+public class Aresta implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     public Point3D origem;
     public Point3D destino;
     public int yMin;

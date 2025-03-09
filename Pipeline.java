@@ -1,4 +1,7 @@
-public class Pipeline {
+import java.io.Serializable;
+
+public class Pipeline implements Serializable{
+    private static final long serialVersionUID = 1L;
     private Pipeline() {}
 
     public static Point2D mapearPonto(Point3D vertex, Point3D p, Point3D vrp, Viewport vp) {

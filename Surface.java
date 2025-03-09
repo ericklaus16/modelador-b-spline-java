@@ -1,10 +1,12 @@
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Surface {
+public class Surface implements Serializable {
+    private static final long serialVersionUID = 1L;
     public Integer id;
     public String name;
     public int m;

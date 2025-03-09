@@ -1,4 +1,8 @@
-public class Curve {
+import java.io.Serializable;
+
+public class Curve implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public void SplinePoint(double[] u, int n, int t, double v, Point3D[] control, Point3D output) {
         output.x = (0);
         output.y = (0);

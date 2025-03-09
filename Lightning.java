@@ -1,4 +1,7 @@
-public class Lightning {
+import java.io.Serializable;
+
+public class Lightning implements Serializable {
+    private static final long serialVersionUID = 1L;
     public static double Illuminate(Point3D centroide, Point3D normal, double ila, Point3D l, double il, double ka, double kd, double ks, Point3D s) {
         double iA = Ambient(ka, ila);
 //        System.out.println("Ambient: " + iA);

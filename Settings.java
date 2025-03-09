@@ -1,7 +1,9 @@
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.List;
 
-public class Settings {
+public class Settings implements Serializable {
+    private static final long serialVersionUID = 1L;
     public int width;
     public int height;
     public int widthViewport;

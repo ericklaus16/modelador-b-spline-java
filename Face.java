@@ -1,7 +1,9 @@
 import java.awt.*;
+import java.io.Serializable;
 import java.util.List;
 
-public class Face {
+public class Face implements Serializable {
+    private static final long serialVersionUID = 1L;
     public Point3D A;
     public Point3D B;
     public Point3D C;

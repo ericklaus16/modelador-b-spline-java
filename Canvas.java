@@ -1,6 +1,14 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,16 +38,106 @@ public class Canvas extends JPanel {
         surfacesPanel.setLayout(new BoxLayout(surfacesPanel, BoxLayout.Y_AXIS));
         
         // Botão para criar uma nova superfície
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    
+        // Botão para criar uma nova superfície
         JButton createButton = new JButton("Criar Nova Superfície");
-        createButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createButton.addActionListener(e -> createNewSurface());
         
-        JPanel buttonPanel = new JPanel();
+        // Botão para carregar uma superfície existente
+        JButton loadButton = new JButton("Carregar Superfície");
+        loadButton.addActionListener(e -> loadSurfaceFromFile());
+        
+        // Adicionar os botões ao painel
         buttonPanel.add(createButton);
+        buttonPanel.add(loadButton);
         
         surfacesFrame.add(buttonPanel, BorderLayout.NORTH);
         surfacesFrame.add(new JScrollPane(surfacesPanel), BorderLayout.CENTER);
         surfacesFrame.setVisible(true);
+    }
+
+    private void loadSurfaceFromFile() {
+        try {
+            // Criar seletor de arquivo
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Carregar Superfície");
+            
+            // Adicionar filtro para arquivos .surf
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Arquivos de Superfície (*.surf)", "surf");
+            fileChooser.setFileFilter(filter);
+            
+            int result = fileChooser.showOpenDialog(surfacesFrame);
+            
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                
+                // Carregar o arquivo usando ObjectInputStream
+                try (ObjectInputStream in = new ObjectInputStream(
+                        new java.io.BufferedInputStream(new java.io.FileInputStream(selectedFile)))) {
+                    
+                    // Ler o objeto salvo
+                    SavedSurface loadedData = (SavedSurface) in.readObject();
+                    
+                    // Verificar se já existe uma superfície com o mesmo nome
+                    String surfaceName = loadedData.name;
+                    int counter = 1;
+                    
+                    // Se o nome já existe, adicionar um sufixo numérico
+                    while (surfaceMap.containsKey(surfaceName)) {
+                        surfaceName = loadedData.name + " (" + counter + ")";
+                        counter++;
+                    }
+                    
+                    // Adicionar a superfície carregada aos mapas
+                    surfaceMap.put(surfaceName, loadedData.surface);
+                    settingsMap.put(surfaceName, loadedData.settings);
+                    
+                    // Criar uma variável final para usar na lambda
+                    final String finalSurfaceName = surfaceName;
+                    
+                    // Criar botão para a superfície carregada
+                    JButton surfaceButton = new JButton(finalSurfaceName);
+                    surfaceButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    surfaceButton.addActionListener(e -> {
+                        // Atualizar referências usando a variável final
+                        settings = settingsMap.get(finalSurfaceName);
+                        superficie = surfaceMap.get(finalSurfaceName);
+                        
+                        // Abrir configurações
+                        openConfigurationsForSurface(finalSurfaceName);
+                    });
+                    
+                    // Adicionar botão ao painel
+                    surfacesPanel.add(surfaceButton);
+                    surfacesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                    surfacesPanel.revalidate();
+                    surfacesPanel.repaint();
+                    
+                    // Atualizar referências atuais
+                    settings = loadedData.settings;
+                    superficie = loadedData.surface;
+                    
+                    // Abrir configurações para a superfície carregada
+                    openConfigurationsForSurface(finalSurfaceName);
+                    
+                    JOptionPane.showMessageDialog(surfacesFrame, 
+                        "Superfície carregada com sucesso!\nNome: " + finalSurfaceName,
+                        "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException | ClassNotFoundException ex) {
+                    JOptionPane.showMessageDialog(surfacesFrame, 
+                        "Erro ao carregar o arquivo: " + ex.getMessage(),
+                        "Erro", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
+                }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(surfacesFrame, 
+                "Erro inesperado: " + ex.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
     }
 
     private void createNewSurface() {
@@ -293,8 +391,76 @@ public class Canvas extends JPanel {
 
         // Botão de salvar
         gbc.gridy++;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton saveButton = new JButton("Atualizar Superfície");
-        mainPanel.add(saveButton, gbc);
+        buttonPanel.add(saveButton);
+
+        JButton saveToFileButton = new JButton("Salvar Superfície");
+        buttonPanel.add(saveToFileButton);
+
+        saveToFileButton.addActionListener(e -> {
+            try {
+                // Encontrar a superfície atual
+                String surfaceAtualKey = null;
+                for (Map.Entry<String, Surface> entry : surfaceMap.entrySet()) {
+                    if (entry.getValue() == superficie) {
+                        surfaceAtualKey = entry.getKey();
+                        break;
+                    }
+                }
+                
+                if (surfaceAtualKey != null) {
+                    // Criar um seletor de arquivo
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setDialogTitle("Salvar Superfície");
+                    
+                    // Adicionar filtro de arquivo para .surf
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                        "Arquivos de Superfície (*.surf)", "surf");
+                    fileChooser.setFileFilter(filter);
+                    
+                    // Sugerir nome baseado na chave da superfície
+                    fileChooser.setSelectedFile(new File(surfaceAtualKey.toLowerCase().replace(" ", "_") + ".surf"));
+                    
+                    int userSelection = fileChooser.showSaveDialog(configFrame);
+                    
+                    if (userSelection == JFileChooser.APPROVE_OPTION) {
+                        File fileToSave = fileChooser.getSelectedFile();
+                        
+                        // Garantir que o arquivo tenha a extensão .surf
+                        String filePath = fileToSave.getAbsolutePath();
+                        if (!filePath.toLowerCase().endsWith(".surf")) {
+                            fileToSave = new File(filePath + ".surf");
+                        }
+                        
+                        // Preparar dados para salvar
+                        SavedSurface dataToSave = new SavedSurface();
+                        dataToSave.surface = superficie;
+                        dataToSave.settings = settings;
+                        dataToSave.name = surfaceAtualKey;
+                        
+                        // Salvar usando ObjectOutputStream
+                        try (ObjectOutputStream out = new ObjectOutputStream(
+                                new BufferedOutputStream(new FileOutputStream(fileToSave)))) {
+                            out.writeObject(dataToSave);
+                            JOptionPane.showMessageDialog(configFrame, 
+                                "Superfície salva com sucesso em:\n" + fileToSave.getAbsolutePath(),
+                                "Salvo", JOptionPane.INFORMATION_MESSAGE);
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(configFrame, 
+                                "Erro ao salvar superfície: " + ex.getMessage(),
+                                "Erro", JOptionPane.ERROR_MESSAGE);
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(configFrame, 
+                    "Erro: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        });
+
 
         saveButton.addActionListener(e -> {
             try {
@@ -377,6 +543,7 @@ public class Canvas extends JPanel {
                 JOptionPane.showMessageDialog(configFrame, "Erro ao processar valores numéricos");
             }
         });
+        mainPanel.add(buttonPanel, gbc);
 
         // Adiciona o painel à janela
         configFrame.add(new JScrollPane(mainPanel), BorderLayout.CENTER);

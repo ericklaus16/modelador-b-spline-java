@@ -1,4 +1,7 @@
-public class Point3D {
+import java.io.Serializable;
+
+public class Point3D implements Serializable {
+    private static final long serialVersionUID = 1L;
     public double x;
     public double y;
     public double z;
