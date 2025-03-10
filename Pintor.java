@@ -70,6 +70,10 @@ public class Pintor {
         double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
         double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
 
+        // if(d < superficie.settings.near || d > superficie.settings.far) {
+        //     return;
+        // }
+        
         faces.add(new Face(A, B, C, D, d, i, j, superficie.settings.cameraPos));
     }
 
@@ -392,7 +396,6 @@ public class Pintor {
         }
     }
 
-
     public static void pintor(Graphics g, List<Point2D> pontos, Surface superficie) {
         renderLines(g, pontos, superficie);
 
@@ -412,7 +415,7 @@ public class Pintor {
         } else if(superficie.settings.shader == Shader.Gouraud){
             for (Face face : superficie.faces) {
                 // Obter os pontos 2D projetados
-                if(face.visibilidade <= 0) return;
+                if(face.visibilidade <= 0) continue;
                 List<Point2D> facePontos = List.of(
                         pontos.get(face.i * superficie.outp[0].length + face.j),
                         pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),
@@ -431,10 +434,48 @@ public class Pintor {
                 // Chamar polyFill com interpolação de cores
                 polyFillGouraud(g, facePontos, faceCores);
             }
-        } else if(superficie.settings.shader == Shader.Phong){
-
+        }else if(superficie.settings.shader == Shader.Phong){
+            for (Face face : superficie.faces) {
+                if (face.visibilidade <= 0) continue;
+                List<Point2D> facePontos = List.of(
+                        pontos.get(face.i * superficie.outp[0].length + face.j),
+                        pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),
+                        pontos.get((face.i + 1) * superficie.outp[0].length + (face.j + 1)),
+                        pontos.get((face.i + 1) * superficie.outp[0].length + face.j)
+                );
+    
+                // Implementação do shader Phong
+                // Obter as cores dos vértices usando iluminação Phong
+                List<Color> faceCores = List.of(
+                        calculatePhongColor(face.A, superficie),
+                        calculatePhongColor(face.B, superficie),
+                        calculatePhongColor(face.C, superficie),
+                        calculatePhongColor(face.D, superficie)
+                );
+    
+                polyFillGouraud(g, facePontos, faceCores);
+            }
         }
 
         // Zbuffer
+    }
+
+    private static Color calculatePhongColor(Point3D vertex, Surface superficie) {
+        Point3D normal = Point3D.getNormalizedVector(vertex);
+        Point3D viewDir = Point3D.getNormalizedVector(Point3D.subtract(superficie.settings.cameraPos, vertex));
+
+        double r = Lightning.Illuminate(vertex, normal,
+                superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.il,
+                superficie.settings.kar, superficie.settings.kdr, superficie.settings.ksr, viewDir);
+
+        double g = Lightning.Illuminate(vertex, normal,
+                superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.il,
+                superficie.settings.kag, superficie.settings.kdg, superficie.settings.ksg, viewDir);
+
+        double b = Lightning.Illuminate(vertex, normal,
+                superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.il,
+                superficie.settings.kab, superficie.settings.kdb, superficie.settings.ksb, viewDir);
+
+        return new Color((float) r / 255, (float) g / 255, (float) b / 255);
     }
 }

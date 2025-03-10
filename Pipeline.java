@@ -6,8 +6,16 @@ public class Pipeline implements Serializable{
 
     public static Point2D mapearPonto(Point3D vertex, Point3D p, Point3D vrp, Viewport vp) {
         double[][] msrusrc = transformacaoDeCamera(vrp, p);
+
         double[][] mproj = projecaoParalela();
+
         double[][] mwindow = windowViewport(vp);
+        for(int i = 0; i < mwindow.length; i++) {
+            for(int j = 0; j < mwindow[0].length; j++) {
+                System.out.print(mwindow[i][j] + " ");
+            }
+            System.out.println();
+        }
 
         double[][] mult = Utils.multiplicarMatriz(mwindow, mproj);
         double[][] msrusrt = Utils.multiplicarMatriz(mult, msrusrc);
@@ -18,6 +26,7 @@ public class Pipeline implements Serializable{
         if (ponto2D.h != 1) {
             ponto2D.x = ponto2D.x / ponto2D.h;
             ponto2D.y = ponto2D.y / ponto2D.h;
+            ponto2D.y *= -1;
             ponto2D.h = 1;
         }
 

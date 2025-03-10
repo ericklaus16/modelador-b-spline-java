@@ -2,9 +2,9 @@ public class Test {
     Test(){};
 
     public static void main(String[] args) {
-        // Test.Pipeline();
+        Test.Pipeline();
         // Test.VisibilidadePorNormal();
-        Test.Buffer();
+        // Test.Buffer();
         // Test.Lightning();
     }
 
@@ -12,10 +12,10 @@ public class Test {
 		System.out.println("=========TESTE PIPELINE=========");
 		Point3D vrp = new Point3D(25, 15, 80);
 		Point3D p = new Point3D(20, 10, 25);
-        Viewport viewport = new Viewport(0, 319, 0, 239, -8, 8, -6, 6);
+        Viewport viewport = new Viewport(0, 319, 0, 239, -20, 20, -15, 15);
 		Point3D vertex = new Point3D(21.2, 0.7, 42.3, 1);
 		Point2D novoPonto = Pipeline.mapearPonto(vertex, p, vrp, viewport);
-		System.out.println(novoPonto);
+		System.out.println(novoPonto.x + " " + novoPonto.y);
 	}
 
 	public static void VisibilidadePorNormal() {

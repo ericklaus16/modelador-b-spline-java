@@ -41,7 +41,6 @@ public class Face implements Serializable {
 
     public void setNormal() {
         // Suponha face ABC
-
         Point3D BC = Point3D.subtract(C, B);
         Point3D BA = Point3D.subtract(A, B);
 
@@ -55,10 +54,12 @@ public class Face implements Serializable {
     }
 
     public void setVisibility(Point3D vrp){
-
         // Calcular visibilidade
-        visibilidade = Visibility.VisibilidadeNormal(vrp, D, C, B, A);
-
+        visibilidade = Visibility.VisibilidadeNormal(vrp, A, D, C, B);
     }
 
+    @Override
+    public String toString() {
+        return "Face: " + (A.x + " " + A.y + " " + A.z) + " -> " + (B.x + " " + B.y + " " + B.z) + " -> " + (C.x + " " + C.y + " " + C.z) + " -> " + D.x + " " + D.y + " " + D.z;
+    }
 }

@@ -214,6 +214,10 @@ public class Surface implements Serializable {
     }
 
     public void Scale(double s) {
+        if (s == 1 || s == 0) {
+            return;
+        }
+
         double[][] matriz = {
                 {s, 0, 0, 0},
                 {0, s, 0, 0},

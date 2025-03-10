@@ -2,14 +2,33 @@ public class Visibility {
     public Visibility() {}
 
     public static double VisibilidadeNormal(Point3D vrp, Point3D v1, Point3D v2, Point3D v3, Point3D v4) {
+        // ADCB
+        // NOVA FACE 
+        // A: A
+        // B: D
+        // C: C
+        // D: B
+
+        // Face face = new Face(v1, v2, v3, v4, 1, 0, 0, vrp);
+
         Point3D normal = CalcularNormal(v1, v2, v3);
+        // System.out.println("Normal: " + normal.x + " " + normal.y + " " + normal.z);
         Point3D pontoMedio = CalcularPontoMedioQuadrilatero(v1, v2, v3, v4);
+        // System.out.println("Ponto Médio: " + pontoMedio.x + " " + pontoMedio.y + " " + pontoMedio.z);
         Point3D o = CalcularO(vrp, pontoMedio);
         return CalcularVisibilidade(o, normal);
     }
 
     public static double CalcularVisibilidade(Point3D o, Point3D n) {
-        return Point3D.dotProduct(o, n);
+        double visibilidade = Point3D.dotProduct(o, n);
+        if (visibilidade > 0) {
+            System.out.println("Visível");
+        } else {
+            System.out.println("Invisível");
+        }
+        System.out.println("O: " + visibilidade);
+
+        return visibilidade;
     }
 
     public static Point3D CalcularO(Point3D vrp, Point3D pontoMedio) {

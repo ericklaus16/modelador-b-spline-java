@@ -193,7 +193,7 @@ public class Canvas extends JPanel {
     public Canvas(int width, int height, Settings settings, Surface superficie) {
         this.settings = settings;
         this.superficie = superficie;
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
         fillWhite();  // Garante que a tela comece branca
 
         // Garantir que a janela de configurações seja aberta apenas uma vez
@@ -324,12 +324,45 @@ public class Canvas extends JPanel {
         ), gbc);
         gbc.gridy++;
 
-        // Escala
         gbc.gridy++;
-        mainPanel.add(new JLabel("Escala (1x)"), gbc);
-        gbc.gridy++;
-        JSlider scaleSlider = new JSlider(1, 2, 1);
-        mainPanel.add(scaleSlider, gbc);
+        JPanel scalePanel = new JPanel(new BorderLayout(5, 0));
+        scalePanel.add(new JLabel("Escala:"), BorderLayout.WEST);
+
+        // Criar um slider com valores inteiros maiores para uma maior precisão
+        JSlider scaleSlider = new JSlider(1, 200, 100); // Valores de 1 a 200, começando em 100
+        JLabel scaleValueLabel = new JLabel("1.0");
+        scaleValueLabel.setPreferredSize(new Dimension(40, 20));
+        scaleValueLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        // Configura o slider para mostrar as marcações principais
+        scaleSlider.setMajorTickSpacing(50);
+        scaleSlider.setMinorTickSpacing(10);
+        scaleSlider.setPaintTicks(true);
+        scaleSlider.setPaintLabels(false);
+
+        // Adiciona um ChangeListener que converte o valor inteiro do slider para decimal
+        scaleSlider.addChangeListener(e -> {
+            // Converter de 1-200 para 0.1-2.0
+            double scaleValue = scaleSlider.getValue() / 100.0;
+            
+            // Formatar para exibição com uma casa decimal
+            String formattedValue = String.format("%.1f", scaleValue);
+            scaleValueLabel.setText(formattedValue);
+            
+            if(formattedValue == "1,0"){
+                settings.scale = 1;
+            } else {
+                settings.scale = scaleValue;
+            }
+        });
+
+        // Painel para conter o slider e o label de valor
+        JPanel sliderWithValuePanel = new JPanel(new BorderLayout(5, 0));
+        sliderWithValuePanel.add(scaleSlider, BorderLayout.CENTER);
+        sliderWithValuePanel.add(scaleValueLabel, BorderLayout.EAST);
+
+        scalePanel.add(sliderWithValuePanel, BorderLayout.CENTER);
+        mainPanel.add(scalePanel, gbc);
 
         // Wireframe
         gbc.gridy++;
@@ -511,14 +544,13 @@ public class Canvas extends JPanel {
                 for (Map.Entry<String, Surface> entry : surfaceMap.entrySet()) {
                     Surface superf = entry.getValue();
                     Settings config = settingsMap.get(entry.getKey());
-                    
+
                     // Criar viewport com as configurações atuais
-                    Viewport vp = new Viewport(settings.width, settings.height, 
-                                              settings.widthViewport, settings.heightViewport);
-                    
+                    Viewport vp = settings.viewport;
+
                     // Aplicar transformações para a superfície atual
-                    superf.Translate(config.transform.x, config.transform.y, config.transform.z);
-                    superf.Rotate(config.rotation.x, config.rotation.y, config.rotation.z);
+                    superf.Translate(config.transform.x, -config.transform.y, config.transform.z);
+                    superf.Rotate(config.rotation.x, -config.rotation.y, config.rotation.z);
                     superf.Scale(config.scale);
                     
                     // Mapear pontos 3D para 2D para ESTA superfície específica
