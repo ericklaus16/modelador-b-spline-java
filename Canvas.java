@@ -31,7 +31,7 @@ public class Canvas extends JPanel {
 
     public void openSurfaceManager() {
         surfacesFrame = new JFrame("Gerenciador de Superfícies");
-        surfacesFrame.setSize(300, 500);
+        surfacesFrame.setSize(400, 500);
         surfacesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         surfacesPanel = new JPanel();

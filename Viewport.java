@@ -18,4 +18,15 @@ public class Viewport {
         this.ymin = -adjustedHeight / 2;
         this.ymax = adjustedHeight / 2;
     }
+
+    public Viewport (double umin, double umax, double vmin, double vmax, double xmin, double xmax, double ymin, double ymax) {
+        this.umin = umin;
+        this.umax = umax;
+        this.vmin = vmin;
+        this.vmax = vmax;
+        this.xmin = xmin;
+        this.xmax = xmax;
+        this.ymin = ymin;
+        this.ymax = ymax;
+    }
 }
