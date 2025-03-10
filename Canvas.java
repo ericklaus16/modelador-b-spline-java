@@ -349,7 +349,7 @@ public class Canvas extends JPanel {
             String formattedValue = String.format("%.1f", scaleValue);
             scaleValueLabel.setText(formattedValue);
             
-            if(formattedValue == "1,0"){
+            if(formattedValue.equals("1,0")){
                 settings.scale = 1;
             } else {
                 settings.scale = scaleValue;

@@ -2,7 +2,7 @@ public class Test {
     Test(){};
 
     public static void main(String[] args) {
-        Test.Pipeline();
+//        Test.Pipeline();
         // Test.VisibilidadePorNormal();
         // Test.Buffer();
         // Test.Lightning();

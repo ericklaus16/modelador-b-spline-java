@@ -55,7 +55,7 @@ public class Surface implements Serializable {
 
         for (int i = 0; i <= this.m; i++) {
             for (int j = 0; j <= this.n; j++) {
-                this.inp[i][j].x = i;
+                this.inp[i][j].x = i; // i
                 this.inp[i][j].y = j;
                 this.inp[i][j].z = (Math.floor(Math.random() * 10000)) / 5000 - 1;
             }

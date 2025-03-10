@@ -10,12 +10,6 @@ public class Pipeline implements Serializable{
         double[][] mproj = projecaoParalela();
 
         double[][] mwindow = windowViewport(vp);
-        for(int i = 0; i < mwindow.length; i++) {
-            for(int j = 0; j < mwindow[0].length; j++) {
-                System.out.print(mwindow[i][j] + " ");
-            }
-            System.out.println();
-        }
 
         double[][] mult = Utils.multiplicarMatriz(mwindow, mproj);
         double[][] msrusrt = Utils.multiplicarMatriz(mult, msrusrc);

@@ -1,4 +1,7 @@
-public class Viewport {
+import java.io.Serializable;
+
+public class Viewport implements Serializable {
+    private static final long serialVersionUID = 1L;
     public double umin, umax, vmin, vmax;
     public double xmin, xmax, ymin, ymax;
 
