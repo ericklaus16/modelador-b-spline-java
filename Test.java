@@ -1,8 +1,11 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Test {
     Test(){};
 
     public static void main(String[] args) {
-//        Test.Pipeline();
+		// Test.Pipeline();
         // Test.VisibilidadePorNormal();
         // Test.Buffer();
         // Test.Lightning();
@@ -41,11 +44,11 @@ public class Test {
 		ZBuffer.varrerAresta(aresta);
 	}
 
-	public static void Lightning(){
-        Point3D a = new Point3D(151.914, 340.497, -39.024);
-        Point3D b = new Point3D(369.403, 223.801, -52.594);
-        Point3D c = new Point3D(149.556, -51.107, -47.924);
-        Point3D d = new Point3D(0, 0, 0);
+	public static void Lightning() {
+		Point3D a = new Point3D(151.914, 340.497, -39.024);
+		Point3D b = new Point3D(369.403, 223.801, -52.594);
+		Point3D c = new Point3D(149.556, -51.107, -47.924);
+		Point3D d = new Point3D(0, 0, 0);
 		Face face = new Face(a, b, c, d, 0, 0, 0, new Point3D(25, 15, 80));
 		face.centroide = new Point3D(25.100, 8.333, 33.700);
 		face.normal = new Point3D(0.669, 0.378, 0.639);
@@ -59,5 +62,25 @@ public class Test {
 		Point3D s = new Point3D(-0.002, 0.143, 0.990);
 		System.out.println("=========TESTE LIGHTNING=========");
 		System.out.println(Lightning.Illuminate(face.centroide, face.normal, ila, l, il, ka, kd, ks, s));
+	}
+	
+	public static void Recorte() {
+		Cut viewport = new Cut(100, 400, 80, 380);
+		Cut.Vertice a = new Cut.Vertice(0, 250, -30, 200, 120, 30);
+		Cut.Vertice b = new Cut.Vertice(250, 430, -65, 40, 250, 100);
+		Cut.Vertice c = new Cut.Vertice(480, 0, -90, 100, 10, 190);
+
+		List<Cut.Vertice> poligono = new ArrayList<>();
+		poligono.add(a);
+		poligono.add(b);
+		poligono.add(c);
+
+		System.out.println("=========TESTE RECORTE=========");
+		List<Cut.Vertice> resultado = viewport.recortarPoligono(poligono);
+
+		System.out.println("\nResultado final tem " + resultado.size() + " vértices");
+		for (Cut.Vertice v : resultado) {
+			System.out.println(v);
+		}
 	}
 }
