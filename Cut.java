@@ -26,7 +26,7 @@ public class Cut {
 
         @Override
         public String toString() {
-            return String.format("(%.2f, %.2f, %.2f) RGB(%.2f, %.2f, %.2f)",
+            return String.format("(%.3f, %.3f, %.3f) RGB(%.3f, %.3f, %.3f)",
                     x, y, z, r, g, b);
         }
     }
@@ -37,7 +37,6 @@ public class Cut {
             return new ArrayList<>();
         }
 
-        // Exibir polígono original
         System.out.println("\n==== Recorte de Polígono ====");
         System.out.println("Polígono original com " + poligonoEntrada.size() + " vértices:");
         for (Vertice v : poligonoEntrada) {
@@ -45,31 +44,30 @@ public class Cut {
         }
 
         // Aplicar recorte sequencialmente para cada borda
-        List<Vertice> resultado = recortarPorBordaEsquerda(poligonoEntrada);
+        List<Vertice> resultado = recortarBordaEsq(poligonoEntrada);
         if (resultado.isEmpty()) {
             System.out.println("Polígono completamente fora após recorte à esquerda");
             return resultado;
         }
 
-        resultado = recortarPorBordaDireita(resultado);
+        resultado = recortarBordaDir(resultado);
         if (resultado.isEmpty()) {
             System.out.println("Polígono completamente fora após recorte à direita");
             return resultado;
         }
 
-        resultado = recortarPorBordaInferior(resultado);
+        resultado = recortarBordaInf(resultado);
         if (resultado.isEmpty()) {
             System.out.println("Polígono completamente fora após recorte inferior");
             return resultado;
         }
 
-        resultado = recortarPorBordaSuperior(resultado);
+        resultado = recortarBordaSup(resultado);
         if (resultado.isEmpty()) {
             System.out.println("Polígono completamente fora após recorte superior");
             return resultado;
         }
 
-        // Exibir resultado final
         System.out.println("Polígono recortado com " + resultado.size() + " vértices:");
         for (Vertice v : resultado) {
             System.out.println(v);
@@ -78,26 +76,21 @@ public class Cut {
         return resultado;
     }
 
-    // Implementação do recorte pela borda esquerda (x = umin)
-    private List<Vertice> recortarPorBordaEsquerda(List<Vertice> vertices) {
+    // Implementação do recorte pela borda esquerda (x < umin)
+    private List<Vertice> recortarBordaEsq(List<Vertice> vertices) {
         List<Vertice> resultado = new ArrayList<>();
         int tamanho = vertices.size();
 
         for (int i = 0; i < tamanho; i++) {
-            // Ponto atual e próximo ponto (circular)
             Vertice atual = vertices.get(i);
             Vertice proximo = vertices.get((i + 1) % tamanho);
 
-            // Posição dos pontos em relação à borda (dentro/fora)
             boolean atualDentro = atual.x >= umin;
             boolean proximoDentro = proximo.x >= umin;
 
-            // Implementar regras do algoritmo Sutherland-Hodgman
             if (atualDentro && proximoDentro) {
-                // Caso 1: Ambos dentro - adicionar apenas o próximo ponto
                 resultado.add(proximo);
             } else if (atualDentro && !proximoDentro) {
-                // Caso 2: Saindo - adicionar ponto de interseção
                 double u = (umin - atual.x) / (proximo.x - atual.x);
                 double y = atual.y + u * (proximo.y - atual.y);
                 double z = atual.z + u * (proximo.z - atual.z);
@@ -109,7 +102,6 @@ public class Cut {
                 resultado.add(intersecao);
                 System.out.println("Interseção com borda esquerda: " + intersecao);
             } else if (!atualDentro && proximoDentro) {
-                // Caso 3: Entrando - adicionar ponto de interseção e próximo ponto
                 double u = (umin - atual.x) / (proximo.x - atual.x);
                 double y = atual.y + u * (proximo.y - atual.y);
                 double z = atual.z + u * (proximo.z - atual.z);
@@ -122,14 +114,13 @@ public class Cut {
                 resultado.add(proximo);
                 System.out.println("Interseção com borda esquerda: " + intersecao);
             }
-            // Caso 4: Ambos fora - não adicionar nada
         }
 
         return resultado;
     }
 
-    // Implementação do recorte pela borda direita (x = umax)
-    private List<Vertice> recortarPorBordaDireita(List<Vertice> vertices) {
+    // Implementação do recorte pela borda direita (x > umax)
+    private List<Vertice> recortarBordaDir(List<Vertice> vertices) {
         List<Vertice> resultado = new ArrayList<>();
         int tamanho = vertices.size();
 
@@ -171,8 +162,8 @@ public class Cut {
         return resultado;
     }
 
-    // Implementação do recorte pela borda inferior (y = vmin)
-    private List<Vertice> recortarPorBordaInferior(List<Vertice> vertices) {
+    // Implementação do recorte pela borda inferior (y < vmin)
+    private List<Vertice> recortarBordaInf(List<Vertice> vertices) {
         List<Vertice> resultado = new ArrayList<>();
         int tamanho = vertices.size();
 
@@ -214,8 +205,8 @@ public class Cut {
         return resultado;
     }
 
-    // Implementação do recorte pela borda superior (y = vmax)
-    private List<Vertice> recortarPorBordaSuperior(List<Vertice> vertices) {
+    // Implementação do recorte pela borda superior (y > vmax)
+    private List<Vertice> recortarBordaSup(List<Vertice> vertices) {
         List<Vertice> resultado = new ArrayList<>();
         int tamanho = vertices.size();
 
