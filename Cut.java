@@ -1,16 +1,8 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Cut {
     public double umin, umax, vmin, vmax;
-
-    static class Vertices {
-        double x1, y1, z1, r1, g1, b1;  // Primeiro vértice
-        double x2, y2, z2, r2, g2, b2;  // Segundo vértice
-
-        Vertices(double x1, double y1, double z1, double r1, double g1, double b1,
-                 double x2, double y2, double z2, double r2, double g2, double b2) {
-            this.x1 = x1; this.y1 = y1; this.z1 = z1; this.r1 = r1; this.g1 = g1; this.b1 = b1;
-            this.x2 = x2; this.y2 = y2; this.z2 = z2; this.r2 = r2; this.g2 = g2; this.b2 = b2;
-        }
-    }
 
     public Cut(double umin, double umax, double vmin, double vmax) {
         this.umin = umin;
@@ -19,224 +11,249 @@ public class Cut {
         this.vmax = vmax;
     }
 
-    public Vertices recorteVertice(double x1, double y1, double z1, double r1, double g1, double b1,
-                                   double x2, double y2, double z2, double r2, double g2, double b2) {
+    public static class Vertice {
+        double x, y, z;
+        double r, g, b;
 
-        System.out.println("\nInício:");
-        System.out.printf("Primeiro vertice: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n", x1, y1, z1, r1, g1, b1);
-        System.out.printf("Segundo vertice: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n", x2, y2, z2, r2, g2, b2);
-
-        Vertices vertices = new Vertices(x1, y1, z1, r1, g1, b1, x2, y2, z2, r2, g2, b2);
-
-        // Aplicar recorte primeiro na esquerda -> direita -> embaixo -> cima
-        vertices = recorteEsquerda(vertices);
-        if (vertices == null) return null;
-
-        vertices = recorteDireita(vertices);
-        if (vertices == null) return null;
-
-        vertices = recorteBaixo(vertices);
-        if (vertices == null) return null;
-
-        vertices = recorteCima(vertices);
-
-        if (vertices != null) {
-            System.out.println("Resultado final do recorte:");
-            System.out.printf("Primeiro vertice: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    vertices.x1, vertices.y1, vertices.z1, vertices.r1, vertices.g1, vertices.b1);
-            System.out.printf("Segundo vertice: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    vertices.x2, vertices.y2, vertices.z2, vertices.r2, vertices.g2, vertices.b2);
-        } else {
-            System.out.println("Os dois vértices estão fora da viewport - aresta rejeitada");
+        public Vertice(double x, double y, double z, double r, double g, double b) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.r = r;
+            this.g = g;
+            this.b = b;
         }
 
-        return vertices;
-    }
-
-    private Vertices recorteEsquerda(Vertices aresta) {
-        if (aresta.x1 >= umin && aresta.x2 >= umin) {
-            System.out.println("Ambos os pontos estão dentro da borda esquerda");
-            return aresta;
-        }
-
-        if (aresta.x1 < umin && aresta.x2 < umin) {
-            System.out.println("Ambos os pontos estão fora da borda esquerda - aresta rejeitada");
-            return null; 
-        }
-
-        double u;
-        if (aresta.x1 < umin) {
-            double x = umin;
-            u = (umin - aresta.x1) / (aresta.x2 - aresta.x1);
-            double y = aresta.y1 + u * (aresta.y2 - aresta.y1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Primeiro vertice (< umin) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
+        @Override
+        public String toString() {
+            return String.format("(%.2f, %.2f, %.2f) RGB(%.2f, %.2f, %.2f)",
                     x, y, z, r, g, b);
-            return new Vertices(x, y, z, r, g, b, aresta.x2, aresta.y2, aresta.z2, aresta.r2, aresta.g2, aresta.b2);
-        } else {
-            double x = umin;
-            u = (umin - aresta.x1) / (aresta.x2 - aresta.x1);
-            double y = aresta.y1 + u * (aresta.y2 - aresta.y1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Segundo vertice (< umin) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    x, y, z, r, g, b);
-            return new Vertices(aresta.x1, aresta.y1, aresta.z1, aresta.r1, aresta.g1, aresta.b1, x, y, z, r, g, b);
         }
     }
 
-    private Vertices recorteDireita(Vertices aresta) {
-        if (aresta.x1 <= umax && aresta.x2 <= umax) {
-            System.out.println("Ambos os pontos estão dentro da borda direita");
-            return aresta; 
+    public List<Vertice> recortarPoligono(List<Vertice> poligonoEntrada) {
+        if (poligonoEntrada == null || poligonoEntrada.size() < 3) {
+            System.out.println("Polígono inválido (menos de 3 vértices)");
+            return new ArrayList<>();
         }
 
-        if (aresta.x1 > umax && aresta.x2 > umax) {
-            System.out.println("Ambos os pontos estão fora da borda direita - aresta rejeitada");
-            return null;
+        // Exibir polígono original
+        System.out.println("\n==== Recorte de Polígono ====");
+        System.out.println("Polígono original com " + poligonoEntrada.size() + " vértices:");
+        for (Vertice v : poligonoEntrada) {
+            System.out.println(v);
         }
 
-        double u;
-        if (aresta.x1 > umax) {
-            double x = umax;
-            u = (umax - aresta.x1) / (aresta.x2 - aresta.x1);
-            double y = aresta.y1 + u * (aresta.y2 - aresta.y1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Primeiro vertice (> umax) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    x, y, z, r, g, b);
-            return new Vertices(x, y, z, r, g, b, aresta.x2, aresta.y2, aresta.z2, aresta.r2, aresta.g2, aresta.b2);
-        } else {
-            double x = umax;
-            u = (umax - aresta.x1) / (aresta.x2 - aresta.x1);
-            double y = aresta.y1 + u * (aresta.y2 - aresta.y1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Segundo vertice (> umax) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    x, y, z, r, g, b);
-            return new Vertices(aresta.x1, aresta.y1, aresta.z1, aresta.r1, aresta.g1, aresta.b1, x, y, z, r, g, b);
+        // Aplicar recorte sequencialmente para cada borda
+        List<Vertice> resultado = recortarPorBordaEsquerda(poligonoEntrada);
+        if (resultado.isEmpty()) {
+            System.out.println("Polígono completamente fora após recorte à esquerda");
+            return resultado;
         }
+
+        resultado = recortarPorBordaDireita(resultado);
+        if (resultado.isEmpty()) {
+            System.out.println("Polígono completamente fora após recorte à direita");
+            return resultado;
+        }
+
+        resultado = recortarPorBordaInferior(resultado);
+        if (resultado.isEmpty()) {
+            System.out.println("Polígono completamente fora após recorte inferior");
+            return resultado;
+        }
+
+        resultado = recortarPorBordaSuperior(resultado);
+        if (resultado.isEmpty()) {
+            System.out.println("Polígono completamente fora após recorte superior");
+            return resultado;
+        }
+
+        // Exibir resultado final
+        System.out.println("Polígono recortado com " + resultado.size() + " vértices:");
+        for (Vertice v : resultado) {
+            System.out.println(v);
+        }
+
+        return resultado;
     }
 
-    private Vertices recorteBaixo(Vertices aresta) {
-        if (aresta.y1 >= vmin && aresta.y2 >= vmin) {
-            System.out.println("Ambos os pontos estão dentro da borda inferior");
-            return aresta;
+    // Implementação do recorte pela borda esquerda (x = umin)
+    private List<Vertice> recortarPorBordaEsquerda(List<Vertice> vertices) {
+        List<Vertice> resultado = new ArrayList<>();
+        int tamanho = vertices.size();
+
+        for (int i = 0; i < tamanho; i++) {
+            // Ponto atual e próximo ponto (circular)
+            Vertice atual = vertices.get(i);
+            Vertice proximo = vertices.get((i + 1) % tamanho);
+
+            // Posição dos pontos em relação à borda (dentro/fora)
+            boolean atualDentro = atual.x >= umin;
+            boolean proximoDentro = proximo.x >= umin;
+
+            // Implementar regras do algoritmo Sutherland-Hodgman
+            if (atualDentro && proximoDentro) {
+                // Caso 1: Ambos dentro - adicionar apenas o próximo ponto
+                resultado.add(proximo);
+            } else if (atualDentro && !proximoDentro) {
+                // Caso 2: Saindo - adicionar ponto de interseção
+                double u = (umin - atual.x) / (proximo.x - atual.x);
+                double y = atual.y + u * (proximo.y - atual.y);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
+
+                Vertice intersecao = new Vertice(umin, y, z, r, g, b);
+                resultado.add(intersecao);
+                System.out.println("Interseção com borda esquerda: " + intersecao);
+            } else if (!atualDentro && proximoDentro) {
+                // Caso 3: Entrando - adicionar ponto de interseção e próximo ponto
+                double u = (umin - atual.x) / (proximo.x - atual.x);
+                double y = atual.y + u * (proximo.y - atual.y);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
+
+                Vertice intersecao = new Vertice(umin, y, z, r, g, b);
+                resultado.add(intersecao);
+                resultado.add(proximo);
+                System.out.println("Interseção com borda esquerda: " + intersecao);
+            }
+            // Caso 4: Ambos fora - não adicionar nada
         }
 
-        if (aresta.y1 < vmin && aresta.y2 < vmin) {
-            System.out.println("Ambos os pontos estão fora da borda inferior - aresta rejeitada");
-            return null;
-        }
-
-        double u;
-        if (aresta.y1 < vmin) {
-            double y = vmin;
-            u = (vmin - aresta.y1) / (aresta.y2 - aresta.y1);
-            double x = aresta.x1 + u * (aresta.x2 - aresta.x1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Primeiro vertice (< vmin) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    x, y, z, r, g, b);
-            return new Vertices(x, y, z, r, g, b, aresta.x2, aresta.y2, aresta.z2, aresta.r2, aresta.g2, aresta.b2);
-        } else {
-            double y = vmin;
-            u = (vmin - aresta.y1) / (aresta.y2 - aresta.y1);
-            double x = aresta.x1 + u * (aresta.x2 - aresta.x1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Segundo vertice (< vmin) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    x, y, z, r, g, b);
-            return new Vertices(aresta.x1, aresta.y1, aresta.z1, aresta.r1, aresta.g1, aresta.b1, x, y, z, r, g, b);
-        }
+        return resultado;
     }
 
-    private Vertices recorteCima(Vertices aresta) {
-        if (aresta.y1 <= vmax && aresta.y2 <= vmax) {
-            System.out.println("Ambos os pontos estão dentro da borda superior");
-            return aresta;
+    // Implementação do recorte pela borda direita (x = umax)
+    private List<Vertice> recortarPorBordaDireita(List<Vertice> vertices) {
+        List<Vertice> resultado = new ArrayList<>();
+        int tamanho = vertices.size();
+
+        for (int i = 0; i < tamanho; i++) {
+            Vertice atual = vertices.get(i);
+            Vertice proximo = vertices.get((i + 1) % tamanho);
+
+            boolean atualDentro = atual.x <= umax;
+            boolean proximoDentro = proximo.x <= umax;
+
+            if (atualDentro && proximoDentro) {
+                resultado.add(proximo);
+            } else if (atualDentro && !proximoDentro) {
+                double u = (umax - atual.x) / (proximo.x - atual.x);
+                double y = atual.y + u * (proximo.y - atual.y);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
+
+                Vertice intersecao = new Vertice(umax, y, z, r, g, b);
+                resultado.add(intersecao);
+                System.out.println("Interseção com borda direita: " + intersecao);
+            } else if (!atualDentro && proximoDentro) {
+                double u = (umax - atual.x) / (proximo.x - atual.x);
+                double y = atual.y + u * (proximo.y - atual.y);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
+
+                Vertice intersecao = new Vertice(umax, y, z, r, g, b);
+                resultado.add(intersecao);
+                resultado.add(proximo);
+                System.out.println("Interseção com borda direita: " + intersecao);
+            }
         }
 
-        if (aresta.y1 > vmax && aresta.y2 > vmax) {
-            System.out.println("Ambos os pontos estão fora da borda superior - aresta rejeitada");
-            return null;
-        }
-
-        double u;
-        if (aresta.y1 > vmax) {
-            double y = vmax;
-            u = (vmax - aresta.y1) / (aresta.y2 - aresta.y1);
-            double x = aresta.x1 + u * (aresta.x2 - aresta.x1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Primeiro vertice (> vmax) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    x, y, z, r, g, b);
-            return new Vertices(x, y, z, r, g, b, aresta.x2, aresta.y2, aresta.z2, aresta.r2, aresta.g2, aresta.b2);
-        } else {
-            double y = vmax;
-            u = (vmax - aresta.y1) / (aresta.y2 - aresta.y1);
-            double x = aresta.x1 + u * (aresta.x2 - aresta.x1);
-            double z = aresta.z1 + u * (aresta.z2 - aresta.z1);
-            double r = aresta.r1 + u * (aresta.r2 - aresta.r1);
-            double g = aresta.g1 + u * (aresta.g2 - aresta.g1);
-            double b = aresta.b1 + u * (aresta.b2 - aresta.b1);
-
-            System.out.printf("Segundo vertice (> vmax) estava fora, recortado para: (%.3f, %.3f, %.3f, %.3f, %.3f, %.3f)%n",
-                    x, y, z, r, g, b);
-            return new Vertices(aresta.x1, aresta.y1, aresta.z1, aresta.r1, aresta.g1, aresta.b1, x, y, z, r, g, b);
-        }
+        return resultado;
     }
 
-    public static void main(String[] args) {
-        Cut recorte = new Cut(100, 400, 80, 380);
+    // Implementação do recorte pela borda inferior (y = vmin)
+    private List<Vertice> recortarPorBordaInferior(List<Vertice> vertices) {
+        List<Vertice> resultado = new ArrayList<>();
+        int tamanho = vertices.size();
 
-        System.out.println("Inicio dos testes");
+        for (int i = 0; i < tamanho; i++) {
+            Vertice atual = vertices.get(i);
+            Vertice proximo = vertices.get((i + 1) % tamanho);
 
-        // Exemplo da planilha Recorte 2D p1
-        recorte.recorteVertice(0.0, 250.0, -30.0, 200.0, 120.0, 30.0, 
-                250.0, 430.0, -65.0, 40.0, 250.0, 100.0); // AB cortando A'
+            boolean atualDentro = atual.y >= vmin;
+            boolean proximoDentro = proximo.y >= vmin;
 
-        recorte.recorteVertice(480.0, 0.0, -90.0, 100.0, 10.0, 190.0,
-                0.0, 250.0, -30.0, 200.0, 120.0, 30.0); // CA cortando A""
+            if (atualDentro && proximoDentro) {
+                resultado.add(proximo);
+            } else if (atualDentro && !proximoDentro) {
+                double u = (vmin - atual.y) / (proximo.y - atual.y);
+                double x = atual.x + u * (proximo.x - atual.x);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
 
-        recorte.recorteVertice(250.0, 430.0, -65.0, 40.0, 250.0, 100.0,
-                480.0, 0.0, -90.0, 100.0, 10.0, 190.0); // BC cortando C'
+                Vertice intersecao = new Vertice(x, vmin, z, r, g, b);
+                resultado.add(intersecao);
+                System.out.println("Interseção com borda inferior: " + intersecao);
+            } else if (!atualDentro && proximoDentro) {
+                double u = (vmin - atual.y) / (proximo.y - atual.y);
+                double x = atual.x + u * (proximo.x - atual.x);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
 
-        recorte.recorteVertice(480.0, 0.0, -90.0, 100.0, 10.0, 190.0,
-                100.0, 197.917, -42.500, 179.167, 97.083, 63.333); // CA" cortando C"
+                Vertice intersecao = new Vertice(x, vmin, z, r, g, b);
+                resultado.add(intersecao);
+                resultado.add(proximo);
+                System.out.println("Interseção com borda inferior: " + intersecao);
+            }
+        }
 
-        recorte.recorteVertice(250.0, 430.0, -65.0, 40.0, 250.0, 100.0,
-                400.0, 149.565, -81.304, 79.130, 93.478, 158.696); // BC' cortando B'
+        return resultado;
+    }
 
-        recorte.recorteVertice(100.0, 322.0, -44.0, 136.0, 172.0, 58.0,
-                250.0, 430.0, -65.0, 40.0, 250.0, 100.0); // A'B cortando B"
+    // Implementação do recorte pela borda superior (y = vmax)
+    private List<Vertice> recortarPorBordaSuperior(List<Vertice> vertices) {
+        List<Vertice> resultado = new ArrayList<>();
+        int tamanho = vertices.size();
 
-        recorte.recorteVertice(400.0, 149.565, -81.304, 79.130, 93.478, 158.696,
-                400.0, 41.667, -80.0, 116.667, 28.333, 163.333); // C'C" cortando C'''
+        for (int i = 0; i < tamanho; i++) {
+            Vertice atual = vertices.get(i);
+            Vertice proximo = vertices.get((i + 1) % tamanho);
 
-        recorte.recorteVertice(400.0, 41.667, -80.0, 116.667, 28.333, 163.333,
-                100.0, 197.917, -42.500, 179.167, 97.083, 63.333); // C"A" cortando C''''
+            boolean atualDentro = atual.y <= vmax;
+            boolean proximoDentro = proximo.y <= vmax;
+
+            if (atualDentro && proximoDentro) {
+                resultado.add(proximo);
+            } else if (atualDentro && !proximoDentro) {
+                double u = (vmax - atual.y) / (proximo.y - atual.y);
+                double x = atual.x + u * (proximo.x - atual.x);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
+
+                Vertice intersecao = new Vertice(x, vmax, z, r, g, b);
+                resultado.add(intersecao);
+                System.out.println("Interseção com borda superior: " + intersecao);
+            } else if (!atualDentro && proximoDentro) {
+                double u = (vmax - atual.y) / (proximo.y - atual.y);
+                double x = atual.x + u * (proximo.x - atual.x);
+                double z = atual.z + u * (proximo.z - atual.z);
+                double r = atual.r + u * (proximo.r - atual.r);
+                double g = atual.g + u * (proximo.g - atual.g);
+                double b = atual.b + u * (proximo.b - atual.b);
+
+                Vertice intersecao = new Vertice(x, vmax, z, r, g, b);
+                resultado.add(intersecao);
+                resultado.add(proximo);
+                System.out.println("Interseção com borda superior: " + intersecao);
+            }
+        }
+
+        return resultado;
     }
 }
