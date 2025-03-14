@@ -20,7 +20,7 @@ public class Pipeline implements Serializable{
         if (ponto2D.h != 1) {
             ponto2D.x = ponto2D.x / ponto2D.h;
             ponto2D.y = ponto2D.y / ponto2D.h;
-            ponto2D.y *= -1;
+            // ponto2D.y *= -1;
             ponto2D.h = 1;
         }
 
