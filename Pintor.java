@@ -400,7 +400,25 @@ public class Pintor {
         renderLines(g, pontos, superficie);
 
         if(superficie.settings.shader == Shader.Wireframe){
-            polyFill(g, new Color(1f, 1f, 1f, 0f), pontos);
+            // Ordenar as faces por profundidade (da mais distante para a mais próxima)
+            superficie.faces.sort((f1, f2) -> Double.compare(f2.d, f1.d));
+            
+            // Preencher apenas as faces visíveis com branco
+            for (Face face : superficie.faces) {
+                if (face.visibilidade > 0) {  // Preencher apenas faces visíveis
+                    List<Point2D> facePontos = List.of(
+                            pontos.get(face.i * superficie.outp[0].length + face.j),
+                            pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),
+                            pontos.get((face.i + 1) * superficie.outp[0].length + (face.j + 1)),
+                            pontos.get((face.i + 1) * superficie.outp[0].length + face.j)
+                    );
+        
+                    polyFill(g, Color.WHITE, facePontos);
+                }
+            }
+            
+            // Redesenhar as linhas após o preenchimento
+            applyWireframeShader(g, pontos, superficie, superficie.outp[0].length);
         } else if(superficie.settings.shader == Shader.Constante){
             for (Face face : superficie.faces) {
                 List<Point2D> facePontos = List.of(
