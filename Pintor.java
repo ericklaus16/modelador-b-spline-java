@@ -21,62 +21,12 @@ public class Pintor {
     }
 
     public static void renderLines(Graphics g, List<Point2D> pontos, Surface superficie) {
-        // Limpar lista de faces antes de processar
-        superficie.faces.clear();
-        int numRows = superficie.outp.length;
         int numCols = superficie.outp[0].length;
-        
-        // Processar geração de faces em paralelo
-        List<Face> newFaces = Collections.synchronizedList(new ArrayList<>());
-        CountDownLatch latch = new CountDownLatch(numRows - 1);
-        
-        for (int i = 0; i < numRows - 1; i++) {
-            final int rowIndex = i;
-            threadPool.submit(() -> {
-                try {
-                    for (int j = 0; j < numCols - 1; j++) {
-                        processFace(rowIndex, j, superficie, newFaces);
-                    }
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
-        
-        try {
-            latch.await(); // Esperar que todas as tasks terminem
-            superficie.faces.addAll(newFaces);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
         
         // Aplicar o shader apropriado
         applyShader(g, pontos, superficie, numCols);
     }
     
-    private static void processFace(int i, int j, Surface superficie, List<Face> faces) {
-        Point3D A = superficie.outp[i][j];
-        Point3D B = superficie.outp[i][j + 1];
-        Point3D C = superficie.outp[i + 1][j + 1];
-        Point3D D = superficie.outp[i + 1][j];
-
-        Point3D centroide = new Point3D(
-            (A.x + B.x + C.x + D.x) / 4,
-            (A.y + B.y + C.y + D.y) / 4,
-            (A.z + B.z + C.z + D.z) / 4,
-            1
-        );
-
-        double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
-        double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
-
-        // if(d < superficie.settings.near || d > superficie.settings.far) {
-        //     return;
-        // }
-        
-        faces.add(new Face(A, B, C, D, d, i, j, superficie.settings.cameraPos));
-    }
-
     private static void applyShader(Graphics g, List<Point2D> pontos, Surface superficie, int numCols) {
         switch (superficie.settings.shader) {
             case Constante:

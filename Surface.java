@@ -64,6 +64,44 @@ public class Surface implements Serializable {
         UpdateSurfaceOutput();
     }
 
+    public Face createFace(int i, int j) {
+        Point3D A = this.outp[i][j];
+        Point3D B = this.outp[i][j + 1];
+        Point3D C = this.outp[i + 1][j + 1];
+        Point3D D = this.outp[i + 1][j];
+    
+        Point3D centroide = new Point3D(
+            (A.x + B.x + C.x + D.x) / 4,
+            (A.y + B.y + C.y + D.y) / 4,
+            (A.z + B.z + C.z + D.z) / 4,
+            1
+        );
+    
+        double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
+        double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
+    
+        // if(d < this.settings.near || d > this.settings.far) {
+        //     return null;
+        // }
+        
+        return new Face(A, B, C, D, d, i, j, this.settings.cameraPos);
+    }
+
+    // Método adicional que pode ser útil na classe Surface
+    public void processFaces() {
+        System.out.println("Processing faces");
+        this.faces.clear();
+        
+        for (int i = 0; i < this.RESOLUTIONI - 1; i++) {
+            for (int j = 0; j < this.RESOLUTIONJ - 1; j++) {
+                Face face = createFace(i, j);
+                if (face != null) {
+                    this.faces.add(face);
+                }
+            }
+        }
+    }
+
     private void updateReferences() {
 		if(this.outp[0][0].x == 0 && this.outp[0][0].y == 0 && this.outp[0][0].z == 0) return;
 
@@ -82,6 +120,7 @@ public class Surface implements Serializable {
             }
         }
         
+        processFaces();
 	}
 
     public void UpdateSurfaceOutput() {
