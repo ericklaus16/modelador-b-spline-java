@@ -78,11 +78,17 @@ public class Surface implements Serializable {
         );
     
         double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
-        double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
+        // double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
+
+        double d = Math.sqrt(
+            Math.pow(this.settings.cameraPos.x - centroide.x, 2) +
+            Math.pow(this.settings.cameraPos.y - centroide.y, 2) +
+            Math.pow(this.settings.cameraPos.z - centroide.z, 2)
+        );
     
-        if(d < this.settings.near || d > this.settings.far) {
-            return null;
-        }
+        // if(d < this.settings.near || d > this.settings.far) {
+        //     return null;
+        // }
         
         return new Face(A, B, C, D, d, i, j, this.settings.cameraPos);
     }
@@ -204,6 +210,7 @@ public class Surface implements Serializable {
             {0, 0, 0, 1}
         };
         atualizarMatrizes(matriz);
+        this.updateReferences();
     }
 
     public void Rotate(double x, double y, double z) {
@@ -282,6 +289,7 @@ public class Surface implements Serializable {
             }
         }
 
+        this.updateReferences();
         // console.log(this.outp[0][0]);
     }
 

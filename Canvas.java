@@ -692,8 +692,8 @@ public class Canvas extends JPanel {
                     Viewport vp = settings.viewport;
 
                     // Aplicar transformações para a superfície atual
-                    superf.Translate(config.transform.x, -config.transform.y, config.transform.z);
-                    superf.Rotate(config.rotation.x, -config.rotation.y, config.rotation.z);
+                    superf.Translate(config.transform.x, config.transform.y, config.transform.z);
+                    superf.Rotate(config.rotation.x, config.rotation.y, config.rotation.z);
                     superf.Scale(config.scale);
                     
                     // Mapear pontos 3D para 2D para ESTA superfície específica
@@ -711,19 +711,20 @@ public class Canvas extends JPanel {
                     Cut cut = new Cut(settings.viewport.umin, settings.viewport.umax, settings.viewport.vmin, settings.viewport.vmax);
                     
                     // Usar diretamente os pontos da superfície, modificando apenas a abordagem de recorte
-                    boolean algumPontoVisivel = false;
+                    // boolean algumPontoVisivel = false;
                     
-                    // Verificar se algum ponto está dentro da viewport
-                    for (Point2D ponto : pontosDaSuperficie) {
-                        if (ponto.x >= settings.viewport.umin && ponto.x <= settings.viewport.umax &&
-                            ponto.y >= settings.viewport.vmin && ponto.y <= settings.viewport.vmax) {
-                            algumPontoVisivel = true;
-                            break;
-                        }
-                    }
+                    // // Verificar se algum ponto está dentro da viewport
+                    // for (Point2D ponto : pontosDaSuperficie) {
+                    //     if (ponto.x >= settings.viewport.umin && ponto.x <= settings.viewport.umax &&
+                    //         ponto.y >= settings.viewport.vmin && ponto.y <= settings.viewport.vmax) {
+                    //         algumPontoVisivel = true;
+                    //         break;
+                    //     }
+                    // }
                     
                     // Em vez de tentar recortar cada face individualmente (o que é complexo),
                     // vamos deixar que o Pintor use o recorte linha a linha que é mais eficiente
+                    boolean algumPontoVisivel = false;
                     if (algumPontoVisivel) {
                         // Adicionar logs para debug
                         System.out.println("Renderizando superfície com pontos visíveis");
@@ -734,6 +735,7 @@ public class Canvas extends JPanel {
                         // que ele faça o recorte linha a linha, que é geralmente mais eficiente
                         Pintor.pintor(g, pontosDaSuperficie, superf);
                     } else {
+                        Pintor.pintor(g, pontosDaSuperficie, superf);
                         System.out.println("Nenhum ponto visível dentro da viewport");
                     }
                 }

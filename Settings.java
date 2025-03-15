@@ -59,8 +59,8 @@ public class Settings implements Serializable {
         this.ksr = 0.5;
         this.ksg = 0.4;
         this.ksb = 0.3;
-        this.near = 20;
-        this.far = 500;
+        this.near = 100;
+        this.far = 1200;
         this.kn = 2.15;
     }
 

@@ -22,6 +22,13 @@ public class Test {
 	}
 
 	public static void VisibilidadePorNormal() {
+		Point3D a = new Point3D(-10, -20, 10);
+		Point3D b = new Point3D(10, -20, 10);
+		Point3D c = new Point3D(7, 20, 10);
+		Point3D d = new Point3D(-7, 20, 10);
+
+		Face face = new Face(d, c, b, a, 1, 0, 0, new Point3D(30, 50, 300));
+
 		System.err.println("=========TESTE VISIBILIDADE POR NORMAL=========");
 		Point3D p1 = new Point3D(21.2, 0.7, 42.3);
 		Point3D p2 = new Point3D(34.1, 3.4, 27.2);
@@ -30,8 +37,8 @@ public class Test {
         Point3D p5 = new Point3D(20, 20.9, 31.6);
         Point3D p6 = new Point3D(0, 0, 0, 0);
 		
-        Point3D vrp = new Point3D(25, 15, 80);
-		Visibility.VisibilidadeNormal(vrp, p1, p4, p3, p2);
+        Point3D vrp = new Point3D(30, 50, 300);
+		Visibility.VisibilidadeNormal(vrp, d, c, b, a);
 	}
 
 	public static void Buffer() {

@@ -41,21 +41,25 @@ public class Face implements Serializable {
 
     public void setNormal() {
         // Suponha face ABC
-        Point3D BC = Point3D.subtract(C, B);
-        Point3D BA = Point3D.subtract(A, B);
+        Point3D BC = Point3D.subtract(D, C);
+        Point3D BA = Point3D.subtract(B, C);
 
-        Point3D ABC = Point3D.vetorialProduct(BC, BA);
+        Point3D ABC = Point3D.vetorialProduct(BA, BC);
+        // System.out.println("ABC: " + ABC.x + " " + ABC.y + " " + ABC.z);
         normal = Point3D.getNormalizedVector(ABC);
+        // System.out.println("Normal: " + normal.x + " " + normal.y + " " + normal.z);
     }
 
     public void setO(Point3D vrp) {
         Point3D O = Point3D.subtract(vrp, centroide);
         o = Point3D.getNormalizedVector(O);
+        // System.out.println("O: " + o.x + " " + o.y + " " + o.z);
     }
 
     public void setVisibility(Point3D vrp){
         // Calcular visibilidade
-        visibilidade = Visibility.VisibilidadeNormal(vrp, A, D, C, B);
+        visibilidade = Visibility.VisibilidadeNormal(vrp, A, B, C, D);
+        // System.out.println("Visibilidade: " + visibilidade);
     }
 
     @Override
