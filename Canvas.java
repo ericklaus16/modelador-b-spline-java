@@ -237,6 +237,129 @@ public class Canvas extends JPanel {
         g.drawImage(image, 0, 0, null);
     }
 
+    // Método para abrir o editor de pontos de controle
+    private void openControlPointsEditor() {
+        if (superficie == null) {
+            JOptionPane.showMessageDialog(configFrame, 
+                "Nenhuma superfície selecionada para edição.",
+                "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        JFrame editorFrame = new JFrame("Editor de Pontos de Controle");
+        editorFrame.setSize(600, 500);
+        editorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        
+        // Painel com grid para os pontos de controle
+        JPanel gridPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(3, 3, 3, 3);
+        
+        // Adicionar cabeçalhos
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gridPanel.add(new JLabel(""), gbc);
+        
+        for (int j = 0; j <= superficie.n; j++) {
+            gbc.gridx = j + 1;
+            gridPanel.add(new JLabel("Ponto " + j), gbc);
+        }
+        
+        // Componentes para edição dos pontos
+        JTextField[][][] pointFields = new JTextField[superficie.m + 1][superficie.n + 1][3]; // [m][n][xyz]
+        
+        // Criar campos para cada ponto de controle
+        for (int i = 0; i <= superficie.m; i++) {
+            gbc.gridy = i + 1;
+            gbc.gridx = 0;
+            gridPanel.add(new JLabel("Ponto " + i), gbc);
+            
+            for (int j = 0; j <= superficie.n; j++) {
+                gbc.gridx = j + 1;
+                
+                // Painel para coordenadas XYZ deste ponto
+                JPanel pointPanel = new JPanel(new GridLayout(3, 2));
+                
+                // Criar campos para X, Y, Z
+                JLabel labelX = new JLabel("X:");
+                JTextField fieldX = new JTextField(String.format("%.2f", superficie.inp[i][j].x), 5);
+                pointFields[i][j][0] = fieldX;
+                
+                JLabel labelY = new JLabel("Y:");
+                JTextField fieldY = new JTextField(String.format("%.2f", superficie.inp[i][j].y), 5);
+                pointFields[i][j][1] = fieldY;
+                
+                JLabel labelZ = new JLabel("Z:");
+                JTextField fieldZ = new JTextField(String.format("%.2f", superficie.inp[i][j].z), 5);
+                pointFields[i][j][2] = fieldZ;
+                
+                // Adicionar ao painel deste ponto
+                pointPanel.add(labelX);
+                pointPanel.add(fieldX);
+                pointPanel.add(labelY);
+                pointPanel.add(fieldY);
+                pointPanel.add(labelZ);
+                pointPanel.add(fieldZ);
+                
+                gridPanel.add(pointPanel, gbc);
+            }
+        }
+        
+        // Adicionar painel de rolagem
+        JScrollPane scrollPane = new JScrollPane(gridPanel);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Botões de ação
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton saveButton = new JButton("Aplicar Alterações");
+        JButton cancelButton = new JButton("Cancelar");
+        
+        saveButton.addActionListener(evt -> {
+            try {
+                // Atualizar os pontos de controle
+                for (int i = 0; i <= superficie.m; i++) {
+                    for (int j = 0; j <= superficie.n; j++) {
+                        String textX = pointFields[i][j][0].getText().replace(',', '.');
+                        String textY = pointFields[i][j][1].getText().replace(',', '.');
+                        String textZ = pointFields[i][j][2].getText().replace(',', '.');
+                        
+                        double x = Double.parseDouble(textX);
+                        double y = Double.parseDouble(textY);
+                        double z = Double.parseDouble(textZ);
+                        
+                        superficie.inp[i][j].x = x;
+                        superficie.inp[i][j].y = y;
+                        superficie.inp[i][j].z = z;
+                    }
+                }
+                
+                // Recalcular a superfície
+                superficie.UpdateSurfaceOutput();
+                
+                JOptionPane.showMessageDialog(editorFrame, 
+                    "Pontos de controle atualizados com sucesso!",
+                    "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                
+                editorFrame.dispose();
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(editorFrame,
+                    "Erro: Digite apenas valores numéricos válidos.",
+                    "Erro de formato", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        cancelButton.addActionListener(evt -> editorFrame.dispose());
+        
+        buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        editorFrame.add(mainPanel);
+        editorFrame.setVisible(true);
+    }
+
     public void openConfigurations() {
         if (configFrame == null || !configFrame.isVisible()) {
             configFrame = new JFrame("Configurações");
@@ -421,6 +544,13 @@ public class Canvas extends JPanel {
         mainPanel.add(InterfaceInputs.createInputRow("N", settings.kn,
                 newKn -> settings.kn = newKn
         ), gbc);
+
+        gbc.gridy++;
+        JButton editControlPointsButton = new JButton("Editar Pontos de Controle");
+        editControlPointsButton.addActionListener(e -> openControlPointsEditor());
+        JPanel editButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        editButtonPanel.add(editControlPointsButton);
+        mainPanel.add(editButtonPanel, gbc);
 
         // Botão de salvar
         gbc.gridy++;
