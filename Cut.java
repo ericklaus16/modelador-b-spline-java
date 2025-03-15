@@ -67,6 +67,8 @@ public class Cut {
             System.out.println("Polígono completamente fora após recorte superior");
             return resultado;
         }
+        
+        resultado = reordenarVertices(resultado);
 
         System.out.println("Polígono recortado com " + resultado.size() + " vértices:");
         for (Vertice v : resultado) {
@@ -74,6 +76,23 @@ public class Cut {
         }
 
         return resultado;
+    }
+
+    private List<Vertice> reordenarVertices(List<Vertice> vertices) {
+        if (vertices.size() <= 1) return vertices;
+
+        // Create a new list
+        List<Vertice> reordered = new ArrayList<>(vertices.size());
+
+        // Add the last vertex as the first one
+        reordered.add(vertices.get(vertices.size() - 1));
+
+        // Add all other vertices except the last one
+        for (int i = 0; i < vertices.size() - 1; i++) {
+            reordered.add(vertices.get(i));
+        }
+
+        return reordered;
     }
 
     // Implementação do recorte pela borda esquerda (x < umin)
