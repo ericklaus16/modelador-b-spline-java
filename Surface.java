@@ -80,9 +80,9 @@ public class Surface implements Serializable {
         double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
         double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
     
-        // if(d < this.settings.near || d > this.settings.far) {
-        //     return null;
-        // }
+        if(d < this.settings.near || d > this.settings.far) {
+            return null;
+        }
         
         return new Face(A, B, C, D, d, i, j, this.settings.cameraPos);
     }
