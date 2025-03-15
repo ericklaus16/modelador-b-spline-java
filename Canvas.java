@@ -494,8 +494,12 @@ public class Canvas extends JPanel {
     "Wireframe", "Constante", "Gouraud", "Phong"), gbc);
 
         // Cor de Pintura
-//        gbc.gridy++;
-//        mainPanel.add(InterfaceInputs.createColorSelectionRow("Cor de Pintura", "", settings.paintColor, null), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createColorSelectionRow(
+            "Cor da Aresta Visível", "Cor da Aresta Não Visível", 
+            settings.visibleEdgeColor, settings.notVisibleEdgeColor,
+            newColor -> settings.visibleEdgeColor = newColor,
+            newColor -> settings.notVisibleEdgeColor = newColor), gbc);
 
         // Luz Ambiente
         gbc.gridy++;
@@ -639,7 +643,16 @@ public class Canvas extends JPanel {
                 }
                 
                 if (surfaceAtualKey != null) {
-                    if(settings.m != superficie.m || settings.n != superficie.n) {
+                    if(settings.type != superficie.settings.type){
+                        int resposta = JOptionPane.showConfirmDialog(configFrame, 
+                            "Cuidado! Você alterou o tipo de superfície! Isso gerará uma nova superfície.");
+        
+                        if (resposta != JOptionPane.YES_OPTION) return;
+        
+                        return;
+                    }
+
+                    if(settings.m != superficie.m || settings.n != superficie.n){
                         int resposta = JOptionPane.showConfirmDialog(configFrame, 
                             "Cuidado! Você alterou a matriz de pontos de controle! Isso gerará uma nova superfície.");
         
@@ -698,58 +711,59 @@ public class Canvas extends JPanel {
                     Cut cut = new Cut(settings.viewport.umin, settings.viewport.umax, settings.viewport.vmin, settings.viewport.vmax);
                     List<Point2D> pontosRecortados = new ArrayList<>();
 
-                    int numCols = superf.outp[0].length;
-                    for (Face face : superf.faces) {
-                        // Obter os índices dos vértices da face
-                        int i = face.i;
-                        int j = face.j;
+                    // int numCols = superf.outp[0].length;
+                    // for (Face face : superf.faces) {
+                    //     // Obter os índices dos vértices da face
+                    //     int i = face.i;
+                    //     int j = face.j;
                         
-                        // Obter os pontos 2D correspondentes
-                        int idxA = i * numCols + j;
-                        int idxB = i * numCols + (j + 1);
-                        int idxC = (i + 1) * numCols + (j + 1);
-                        int idxD = (i + 1) * numCols + j;
+                    //     // Obter os pontos 2D correspondentes
+                    //     int idxA = i * numCols + j;
+                    //     int idxB = i * numCols + (j + 1);
+                    //     int idxC = (i + 1) * numCols + (j + 1);
+                    //     int idxD = (i + 1) * numCols + j;
                         
-                        // Verificar se os índices estão dentro dos limites
-                        if (idxA < pontosDaSuperficie.size() && 
-                            idxB < pontosDaSuperficie.size() && 
-                            idxC < pontosDaSuperficie.size() && 
-                            idxD < pontosDaSuperficie.size()) {
+                    //     // Verificar se os índices estão dentro dos limites
+                    //     if (idxA < pontosDaSuperficie.size() && 
+                    //         idxB < pontosDaSuperficie.size() && 
+                    //         idxC < pontosDaSuperficie.size() && 
+                    //         idxD < pontosDaSuperficie.size()) {
                             
-                            // Obter os pontos 2D da face
-                            Point2D p1 = pontosDaSuperficie.get(idxA);
-                            Point2D p2 = pontosDaSuperficie.get(idxB);
-                            Point2D p3 = pontosDaSuperficie.get(idxC);
-                            Point2D p4 = pontosDaSuperficie.get(idxD);
+                    //         // Obter os pontos 2D da face
+                    //         Point2D p1 = pontosDaSuperficie.get(idxA);
+                    //         Point2D p2 = pontosDaSuperficie.get(idxB);
+                    //         Point2D p3 = pontosDaSuperficie.get(idxC);
+                    //         Point2D p4 = pontosDaSuperficie.get(idxD);
                             
-                            // Recortar a face (quadrilátero)
-                            List<Cut.Vertice> poligonoParaRecortar = new ArrayList<>();
+                    //         // Recortar a face (quadrilátero)
+                    //         List<Cut.Vertice> poligonoParaRecortar = new ArrayList<>();
         
-                            // Converter cada ponto 2D para um vértice do recortador
-                            // Supondo que Cut.Vertice aceite (x, y, z, r, g, b) como parâmetros
-                            poligonoParaRecortar.add(new Cut.Vertice(p1.x, p1.y, 0, 0, 0, 0));
-                            poligonoParaRecortar.add(new Cut.Vertice(p2.x, p2.y, 0, 0, 0, 0));
-                            poligonoParaRecortar.add(new Cut.Vertice(p3.x, p3.y, 0, 0, 0, 0));
-                            poligonoParaRecortar.add(new Cut.Vertice(p4.x, p4.y, 0, 0, 0, 0));
+                    //         // Converter cada ponto 2D para um vértice do recortador
+                    //         // Supondo que Cut.Vertice aceite (x, y, z, r, g, b) como parâmetros
+                    //         poligonoParaRecortar.add(new Cut.Vertice(p1.x, p1.y, 0, 0, 0, 0));
+                    //         poligonoParaRecortar.add(new Cut.Vertice(p2.x, p2.y, 0, 0, 0, 0));
+                    //         poligonoParaRecortar.add(new Cut.Vertice(p3.x, p3.y, 0, 0, 0, 0));
+                    //         poligonoParaRecortar.add(new Cut.Vertice(p4.x, p4.y, 0, 0, 0, 0));
                             
-                            // Recortar o polígono
-                            List<Cut.Vertice> verticesRecortados = cut.recortarPoligono(poligonoParaRecortar);
+                    //         // Recortar o polígono
+                    //         List<Cut.Vertice> verticesRecortados = cut.recortarPoligono(poligonoParaRecortar);
                             
-                            // Converter vértices recortados de volta para Point2D
-                            if (verticesRecortados != null && !verticesRecortados.isEmpty()) {
-                                for (Cut.Vertice v : verticesRecortados) {
-                                    // Converter vértice para Point2D (extrair apenas as coordenadas x,y)
-                                    pontosRecortados.add(new Point2D(v.x, v.y));
-                                }
-                            }
-                        }
-                    }
+                    //         // Converter vértices recortados de volta para Point2D
+                    //         if (verticesRecortados != null && !verticesRecortados.isEmpty()) {
+                    //             for (Cut.Vertice v : verticesRecortados) {
+                    //                 // Converter vértice para Point2D (extrair apenas as coordenadas x,y)
+                    //                 pontosRecortados.add(new Point2D(v.x, v.y));
+                    //             }
+                    //         }
+                    //     }
+                    // }
 
                     // Usar os pontos recortados para renderizar
                     if (!pontosRecortados.isEmpty()) {
                         Pintor.pintor(g, pontosRecortados, superf);
                     } else {
                         // Caso não haja pontos visíveis após o recorte
+                        Pintor.pintor(g, pontosDaSuperficie, superf);
                         System.out.println("Nenhum ponto visível após o recorte");
                     }
                 }

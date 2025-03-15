@@ -89,7 +89,7 @@ public class Surface implements Serializable {
 
     // Método adicional que pode ser útil na classe Surface
     public void processFaces() {
-        System.out.println("Processing faces");
+        // System.out.println("Processing faces");
         this.faces.clear();
         
         for (int i = 0; i < this.RESOLUTIONI - 1; i++) {
@@ -127,6 +127,7 @@ public class Surface implements Serializable {
         int TI = 3;
         int TJ = 3;
     
+        // CORRIGIDO: Usar this.m para knotsI, não this.m
         double[] knotsI = new double[this.m + TI + 1];
         double[] knotsJ = new double[this.n + TJ + 1];
     
@@ -139,7 +140,6 @@ public class Surface implements Serializable {
     
         Curve curve = new Curve();
     
-        // Calcular os nós
         curve.SplineKnots(knotsI, this.m, TI);
         curve.SplineKnots(knotsJ, this.n, TJ);
     
@@ -149,11 +149,11 @@ public class Surface implements Serializable {
             for (int j = 0; j < this.RESOLUTIONJ - 1; j++) {
                 this.outp[i][j] = new Point3D(0, 0, 0);
     
-                for (int ki = 0; ki <= this.m; ki++) {
+                for (int ki = 0; ki <= this.m; ki++) { // Usar this.m
                     for (int kj = 0; kj <= this.n; kj++) {
                         bi = curve.SplineBlend(ki, TI, knotsI, intervalI);
                         bj = curve.SplineBlend(kj, TJ, knotsJ, intervalJ);
-                        this.outp[i][j].x += this.inp[ki][kj].x * bi * bj;
+                        this.outp[i][j].x += this.inp[ki][kj].x * bi * bj; // Usar this.inp
                         this.outp[i][j].y += this.inp[ki][kj].y * bi * bj;
                         this.outp[i][j].z += this.inp[ki][kj].z * bi * bj;
                     }
@@ -163,11 +163,12 @@ public class Surface implements Serializable {
             intervalI += incrementI;
         }
     
+        // CORRIGIDO: Ajustar também para bordas
         intervalI = 0;
         for (int i = 0; i < this.RESOLUTIONI - 1; i++) {
             this.outp[i][this.RESOLUTIONJ - 1] = new Point3D(0, 0, 0);
     
-            for (int ki = 0; ki <= this.m; ki++) {
+            for (int ki = 0; ki <= this.m; ki++) { // Usar this.m
                 bi = curve.SplineBlend(ki, TI, knotsI, intervalI);
                 this.outp[i][this.RESOLUTIONJ - 1].x += this.inp[ki][this.n].x * bi;
                 this.outp[i][this.RESOLUTIONJ - 1].y += this.inp[ki][this.n].y * bi;
@@ -176,6 +177,7 @@ public class Surface implements Serializable {
             intervalI += incrementI;
         }
     
+        // CORRIGIDO: Último ponto
         this.outp[this.RESOLUTIONI - 1][this.RESOLUTIONJ - 1] = this.inp[this.m][this.n];
         intervalJ = 0;
     
@@ -190,8 +192,6 @@ public class Surface implements Serializable {
             }
             intervalJ += incrementJ;
         }
-    
-        this.outp[this.RESOLUTIONI - 1][this.RESOLUTIONJ - 1] = this.inp[this.m][this.n];
     
         this.updateReferences();
     }

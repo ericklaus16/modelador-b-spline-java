@@ -2,13 +2,6 @@ import java.util.function.Consumer;
 import javax.swing.*;
 import java.awt.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -147,22 +140,54 @@ public class InterfaceInputs {
     }
 
     // Cria um painel para seleção de cores
-    public static JPanel createColorSelectionRow(String label1, String label2, Color color1, Color color2) {
-        JPanel panel = new JPanel(new GridLayout(1, 4));
+    public static JPanel createColorSelectionRow(String label1, String label2, 
+                                                Color color1, Color color2,
+                                                Consumer<Color> updateColor1,
+                                                Consumer<Color> updateColor2) {
+        JPanel panel = new JPanel(new GridLayout(2, 2));
+        
         panel.add(new JLabel(label1));
         JButton colorButton1 = new JButton();
         colorButton1.setBackground(color1);
+        colorButton1.setPreferredSize(new Dimension(30, 20));
+        
+        // Adicionar ActionListener para abrir o seletor de cores
+        colorButton1.addActionListener(e -> {
+            Color newColor = JColorChooser.showDialog(
+                panel,
+                "Escolha uma cor para " + label1,
+                colorButton1.getBackground()
+            );
+            if (newColor != null) {
+                colorButton1.setBackground(newColor);
+                updateColor1.accept(newColor);
+            }
+        });
         panel.add(colorButton1);
 
-        if (label2 != null && color2 != null) {
+        if (label2 != null && color2 != null && updateColor2 != null) {
             panel.add(new JLabel(label2));
             JButton colorButton2 = new JButton();
             colorButton2.setBackground(color2);
+            colorButton2.setPreferredSize(new Dimension(30, 20));
+            
+            // Adicionar ActionListener para o segundo botão
+            colorButton2.addActionListener(e -> {
+                Color newColor = JColorChooser.showDialog(
+                    panel,
+                    "Escolha uma cor para " + label2,
+                    colorButton2.getBackground()
+                );
+                if (newColor != null) {
+                    colorButton2.setBackground(newColor);
+                    updateColor2.accept(newColor);
+                }
+            });
             panel.add(colorButton2);
         }
+        
         return panel;
     }
-
     // Cria botões de rádio
     public static JPanel createRadioButtonGroup(String title, Consumer<String> updateValue, String... options) {
         JPanel panel = new JPanel();
