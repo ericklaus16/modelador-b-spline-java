@@ -1,9 +1,13 @@
+package Surface;
+import Main.*;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import Geometria.*;
 
 public class Surface implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -20,6 +24,7 @@ public class Surface implements Serializable {
     public List<Face> faces = new ArrayList<>();
     public Settings settings = new Settings();
     public Map<Point3D, Color> vertexColors = new HashMap<>();
+    public double z ;
 
     public Surface(int m, int n, int RESOLUTIONI, int RESOLUTIONJ) {
         this.name = "";
@@ -78,7 +83,7 @@ public class Surface implements Serializable {
         );
     
         double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
-        // double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
+        //double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
 
         double d = Math.sqrt(
             Math.pow(this.settings.cameraPos.x - centroide.x, 2) +
@@ -106,6 +111,7 @@ public class Surface implements Serializable {
                 }
             }
         }
+        z = (faces.get(faces.size()/2).d);
     }
 
     private void updateReferences() {

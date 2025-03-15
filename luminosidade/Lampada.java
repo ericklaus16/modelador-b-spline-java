@@ -1,5 +1,8 @@
+package luminosidade;
+
 import java.io.Serializable;
 
+import Geometria.*;
 public class Lampada implements Serializable {
     private static final long serialVersionUID = 1L;
     public double il;

@@ -1,7 +1,11 @@
+package Surface;
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.List;
 
+import Geometria.*;
+import luminosidade.*;
+import Sombreamento.*;
+import Main.*;
 public class Settings implements Serializable {
     private static final long serialVersionUID = 1L;
     public int width;

@@ -1,5 +1,8 @@
+package Pipe;
 import java.io.Serializable;
 
+import Geometria.*;
+import Main.*;
 public class Pipeline implements Serializable{
     private static final long serialVersionUID = 1L;
     private Pipeline() {}

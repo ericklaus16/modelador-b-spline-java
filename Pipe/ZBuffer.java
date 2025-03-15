@@ -1,5 +1,8 @@
+package Pipe;
 import java.util.ArrayList;
 import java.util.List;
+
+import Geometria.*;
 
 public class ZBuffer {
 

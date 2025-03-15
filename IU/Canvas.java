@@ -1,6 +1,12 @@
+package IU;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import Geometria.*;
+import Sombreamento.*;
+import Surface.*;
+import Pipe.*;
+import Main.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;

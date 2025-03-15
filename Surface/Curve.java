@@ -1,4 +1,7 @@
+package Surface;
 import java.io.Serializable;
+
+import Geometria.*;
 
 public class Curve implements Serializable {
     private static final long serialVersionUID = 1L;

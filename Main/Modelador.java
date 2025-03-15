@@ -1,3 +1,7 @@
+package Main;
+import Surface.*;
+import IU.*;
+
 public class Modelador {
     public static void main(String[] args) {
         Settings settings = new Settings();

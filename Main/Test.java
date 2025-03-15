@@ -1,5 +1,10 @@
+package Main;
 import java.util.ArrayList;
 import java.util.List;
+import Geometria.*;
+import luminosidade.*;
+import Pipe.*;
+
 
 public class Test {
     Test(){};

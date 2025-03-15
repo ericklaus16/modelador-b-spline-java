@@ -1,3 +1,4 @@
+package Geometria;
 import java.io.Serializable;
 
 public class Aresta implements Serializable {
