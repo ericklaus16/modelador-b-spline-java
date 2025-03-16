@@ -79,6 +79,51 @@ public class InterfaceInputs {
         return panel;
     }
 
+    public static JPanel createDoubleInputRow(String label1, Double value1, String label2, Double value2, Consumer<Double> updateValue1, Consumer<Double> updateValue2) {
+        JPanel panel = new JPanel(new GridLayout(1, 4));
+
+        panel.add(new JLabel(label1));
+
+        JTextField textField1 = new JTextField(value1.toString(), 5);
+        panel.add(textField1);
+
+        panel.add(new JLabel(label2));
+
+        JTextField textField2 = new JTextField(value2.toString(), 5);
+        panel.add(textField2);
+
+        // Listeners para atualizar os valores de settings
+        textField1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { update(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { update(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { update(); }
+            private void update() {
+                try {
+                    updateValue1.accept(Double.parseDouble(textField1.getText()));
+                } catch (NumberFormatException ignored) {} // Evita erro enquanto digita
+            }
+        });
+
+        textField2.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { update(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { update(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { update(); }
+            private void update() {
+                try {
+                    updateValue2.accept(Double.parseDouble(textField2.getText()));
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+
+        return panel;
+    }
+
     public static JPanel createTripleInputRow(String label1, Double value1, Double value2, Double value3,
                                                Consumer<Double> updateValue1, Consumer<Double> updateValue2, Consumer<Double> updateValue3) {
         JPanel panel = new JPanel(new GridLayout(1, 6));

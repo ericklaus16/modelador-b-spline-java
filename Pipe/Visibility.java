@@ -4,8 +4,6 @@ public class Visibility {
     public Visibility() {}
 
     public static double VisibilidadeNormal(Point3D vrp, Point3D v1, Point3D v2, Point3D v3, Point3D v4) {
-
-
         Point3D normal = CalcularNormal(v4, v3, v2);
         // System.out.println("Normal: " + normal.x + " " + normal.y + " " + normal.z);
         Point3D pontoMedio = CalcularPontoMedioQuadrilatero(v1, v2, v3, v4);

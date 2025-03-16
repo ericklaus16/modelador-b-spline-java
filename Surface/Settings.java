@@ -12,7 +12,9 @@ public class Settings implements Serializable {
     public int height;
     public int widthViewport;
     public int heightViewport;
+    public int resolutionI, resolutionJ;
     public Viewport viewport;
+    public Window window;
     public Point3D cameraPos;
     public Point3D pontoFocal;
     public int m;
@@ -39,9 +41,12 @@ public class Settings implements Serializable {
         this.height = 800;
         this.widthViewport = 1200;
         this.heightViewport = 1200;
-        this.viewport = new Viewport(0, 629, 0, 439, -64, 64, -48, 48);
+        this.viewport = new Viewport(0, 629, 0, 439);
+        this.window = new Window(-64, 64, -48, 48);
         this.cameraPos = new Point3D(25, 15, 80);
         this.pontoFocal = new Point3D(20, 10, 25);
+        this.resolutionI = 30;
+        this.resolutionJ = 40;
         this.m = 2;
         this.n = 2;
         this.transform = new Point3D(0.0, 0.0, 0.0);

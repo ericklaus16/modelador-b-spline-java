@@ -7,12 +7,12 @@ public class Pipeline implements Serializable{
     private static final long serialVersionUID = 1L;
     private Pipeline() {}
 
-    public static Point2D mapearPonto(Point3D vertex, Point3D p, Point3D vrp, Viewport vp) {
+    public static Point2D mapearPonto(Point3D vertex, Point3D p, Point3D vrp, Viewport vp, Window w) {
         double[][] msrusrc = transformacaoDeCamera(vrp, p);
 
         double[][] mproj = projecaoParalela();
 
-        double[][] mwindow = windowViewport(vp);
+        double[][] mwindow = windowViewport(vp, w);
 
         double[][] mult = Utils.multiplicarMatriz(mwindow, mproj);
         double[][] msrusrt = Utils.multiplicarMatriz(mult, msrusrc);
@@ -72,11 +72,11 @@ public class Pipeline implements Serializable{
         };
     }
 
-    public static double[][] windowViewport(Viewport vp) {
+    public static double[][] windowViewport(Viewport vp, Window w) {
         double umin = vp.umin, umax = vp.umax;
         double vmin = vp.vmin, vmax = vp.vmax;
-        double xmin = vp.xmin, xmax = vp.xmax;
-        double ymin = vp.ymin, ymax = vp.ymax;
+        double xmin = w.xmin, xmax = w.xmax;
+        double ymin = w.ymin, ymax = w.ymax;
 
         return new double[][] {
             {(umax - umin) / (xmax - xmin), 0, 0, (-xmin * (umax - umin) / (xmax - xmin)) + umin},

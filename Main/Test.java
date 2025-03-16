@@ -21,10 +21,11 @@ public class Test {
 		System.out.println("=========TESTE PIPELINE=========");
 		Point3D vrp = new Point3D(25, 15, 80);
 		Point3D p = new Point3D(20, 10, 25);
-        Viewport viewport = new Viewport(0, 319, 0, 239, -20, 20, -15, 15);
+        Viewport viewport = new Viewport(0, 319, 0, 239);
+		Window w = new Window(-20, 20, -15, 15);
 		Point3D vertex = new Point3D(21.2, 0.7, 42.3, 1);
 		Point3D b = new Point3D(34.1, 3.4, 27.2,1);
-		Point2D novoPonto = Pipeline.mapearPonto(b, p, vrp, viewport);
+		Point2D novoPonto = Pipeline.mapearPonto(b, p, vrp, viewport, w);
 		System.out.println(novoPonto.x + " " + novoPonto.y + " " + novoPonto.z);
 	}
 
@@ -113,7 +114,9 @@ public class Test {
 		double dp = 40; // Distância para projeção
 
 		// Viewport e Window
-		Viewport viewport = new Viewport(0, 319, 0, 239, -8, 8, -6, 6);
+		Viewport viewport = new Viewport(0, 319, 0, 239);
+		Window w = new Window(-8, 8, -6, 6);
+
 
 		// Pontos 3D originais
 		Point3D pontoA = new Point3D(21.2, 0.7, 42.3);
@@ -131,11 +134,11 @@ public class Test {
 		System.out.println("E: (" + pontoE.x + ", " + pontoE.y + ", " + pontoE.z + ")");
 
 		// Mapear todos os pontos individualmente
-		Point2D pontoA2D = Pipeline.mapearPonto(pontoA, p, vrp, viewport);
-		Point2D pontoB2D = Pipeline.mapearPonto(pontoB, p, vrp, viewport);
-		Point2D pontoC2D = Pipeline.mapearPonto(pontoC, p, vrp, viewport); // Mapeado mas não usado no recorte
-		Point2D pontoD2D = Pipeline.mapearPonto(pontoD, p, vrp, viewport);
-		Point2D pontoE2D = Pipeline.mapearPonto(pontoE, p, vrp, viewport);
+		Point2D pontoA2D = Pipeline.mapearPonto(pontoA, p, vrp, viewport, w);
+		Point2D pontoB2D = Pipeline.mapearPonto(pontoB, p, vrp, viewport, w);
+		Point2D pontoC2D = Pipeline.mapearPonto(pontoC, p, vrp, viewport, w); // Mapeado mas não usado no recorte
+		Point2D pontoD2D = Pipeline.mapearPonto(pontoD, p, vrp, viewport, w);
+		Point2D pontoE2D = Pipeline.mapearPonto(pontoE, p, vrp, viewport, w);
 
 		// Exibir pontos após mapeamento
 		System.out.println("\nPontos após mapeamento (antes do recorte):");

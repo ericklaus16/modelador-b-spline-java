@@ -28,14 +28,14 @@ public class Surface implements Serializable {
     public Map<Point3D, Color> vertexColors = new HashMap<>();
     public double z ;
 
-    public Surface(int m, int n, int RESOLUTIONI, int RESOLUTIONJ) {
+    public Surface(int m, int n) {
         this.name = "";
         this.m = m;
         this.n = n;
         this.inp = new Point3D[m + 1][n + 1];
         this.outp = new Point3D[RESOLUTIONI][RESOLUTIONJ];
-        this.RESOLUTIONI = RESOLUTIONI;
-        this.RESOLUTIONJ = RESOLUTIONJ;
+        this.RESOLUTIONI = settings.resolutionI;
+        this.RESOLUTIONJ = settings.resolutionJ;
         this.faces = new ArrayList<>();
 
         this.GerarSuperficie();

@@ -3,6 +3,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Geometria.*;
+import Main.Window;
 import Sombreamento.*;
 import Surface.*;
 import Pipe.*;
@@ -151,7 +152,7 @@ public class Canvas extends JPanel {
         
         // Criar nova configuração e superfície
         Settings newSettings = new Settings();
-        Surface newSurface = new Surface(newSettings.m, newSettings.n, 30, 40);
+        Surface newSurface = new Surface(newSettings.m, newSettings.n);
         
         // Salvar nos mapas
         settingsMap.put(surfaceName, newSettings);
@@ -399,7 +400,26 @@ public class Canvas extends JPanel {
         mainPanel.add(InterfaceInputs.createIntegerInputRow("W:", settings.widthViewport, "H:", settings.heightViewport,
                 newWidth -> settings.widthViewport = newWidth,
                 newHeight -> settings.heightViewport = newHeight), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createIntegerInputRow("uMin:", settings.viewport.umin, "uMax:", settings.viewport.umax,
+                newUmin -> settings.viewport.umin = newUmin,
+                newUmax -> settings.viewport.umax = newUmax), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createIntegerInputRow("vMin:", settings.viewport.vmin, "vMax:", settings.viewport.vmax,
+                newVmin -> settings.viewport.umin = newVmin,
+                newVmax -> settings.viewport.umax = newVmax), gbc);
 
+        // Seção Window
+        gbc.gridy++;
+        mainPanel.add(new JLabel("Window"), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createDoubleInputRow("xMin:", settings.window.xmin, "xMax:", settings.window.xmax,
+                newXmin -> settings.window.xmin = newXmin,
+                newXmax -> settings.window.xmax = newXmax), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createDoubleInputRow("yMin:", settings.window.ymin, "yMax:", settings.window.ymax,
+                newYmin -> settings.window.ymin = newYmin,
+                newYmax -> settings.window.ymax = newYmax), gbc);
 
         gbc.gridy++;
         mainPanel.add(InterfaceInputs.createTripleInputRow("Câmera:", settings.cameraPos.x, settings.cameraPos.y, settings.cameraPos.z,
@@ -428,6 +448,10 @@ public class Canvas extends JPanel {
         mainPanel.add(InterfaceInputs.createIntegerInputRow("m:", settings.m, "n:", settings.n,
                 newM -> settings.m = newM,
                 newN -> settings.n = newN), gbc);
+        gbc.gridy++;
+        mainPanel.add(InterfaceInputs.createIntegerInputRow("ResolutionI:", settings.resolutionI, "resolutionJ:", settings.resolutionJ,
+                newI -> settings.resolutionI = newI,
+                newJ -> settings.resolutionJ = newJ), gbc);
 
         // Superfície
         gbc.gridy++;
@@ -636,6 +660,11 @@ public class Canvas extends JPanel {
 
 
         saveButton.addActionListener(e -> {
+            if (settings.viewport.umax != image.getWidth() || settings.viewport.vmax != image.getHeight()) {
+//                image = new BufferedImage(settings.viewport.umax, settings.viewport.vmax, BufferedImage.TYPE_INT_RGB);
+//                fillWhite();  // Garante que a tela comece branca
+            }
+
             try {
                 // Atualizar a superfície atual primeiro
                 String surfaceAtualKey = null;
@@ -665,7 +694,7 @@ public class Canvas extends JPanel {
                         if (resposta != JOptionPane.YES_OPTION) return;
         
                         // Criar nova superfície com novos pontos de controle
-                        Surface novaSuperf = new Surface(settings.m, settings.n, 30, 40);
+                        Surface novaSuperf = new Surface(settings.m, settings.n);
                         superficie = novaSuperf;
                         
                         // Atualizar o mapa
@@ -696,18 +725,21 @@ public class Canvas extends JPanel {
 
                     // Criar viewport com as configurações atuais
                     Viewport vp = settings.viewport;
+                    Window w = settings.window;
 
-                    // Aplicar transformações para a superfície atual
-                    superf.Translate(config.transform.x, config.transform.y, config.transform.z);
-                    superf.Rotate(config.rotation.x, config.rotation.y, config.rotation.z);
-                    superf.Scale(config.scale);
+                    if(surfaceAtualKey.equals(entry.getKey())) {
+                        // Aplicar transformações para a superfície atual
+                        superf.Translate(config.transform.x, config.transform.y, config.transform.z);
+                        superf.Rotate(config.rotation.x, config.rotation.y, config.rotation.z);
+                        superf.Scale(config.scale);
+                    }
 
                     // Mapear pontos 3D para 2D para ESTA superfície específica
                     List<Point2D> pontosDaSuperficie = new ArrayList<>();
                     for (int i = 0; i < superf.outp.length; i++) {
                         for (int j = 0; j < superf.outp[i].length; j++) {
                             Point2D ponto2D = Pipeline.mapearPonto(superf.outp[i][j],
-                                    config.pontoFocal, config.cameraPos, vp);
+                                    config.pontoFocal, config.cameraPos, vp, w);
                             pontosDaSuperficie.add(ponto2D);
                         }
                     }
@@ -774,9 +806,10 @@ public class Canvas extends JPanel {
                         System.out.println("Nenhum ponto visível após o recorte");
                     }
                 }
-                
+
                 // Atualizar a exibição
-                repaint();   
+                repaint();
+
             } catch (NumberFormatException err) {
                 JOptionPane.showMessageDialog(configFrame, "Erro ao processar valores numéricos");
             }
