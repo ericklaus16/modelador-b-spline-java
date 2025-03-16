@@ -8,6 +8,8 @@ public class Aresta implements Serializable {
     public Point3D destino;
     public int yMin;
     public int yMax;
+    public double x;
+    public double z;
     public double dx;
     public double dy;
     public double dz;
@@ -26,6 +28,8 @@ public class Aresta implements Serializable {
 
         this.yMin = (int) Math.floor(Math.min(this.origem.y, this.destino.y));
         this.yMax = (int) Math.ceil(Math.max(this.origem.y, this.destino.y));
+        this.x = this.origem.x;
+        this.z = this.origem.z;
         this.dx = this.destino.x - this.origem.x;
         this.dy = this.destino.y - this.origem.y;
         this.dz = this.destino.z - this.origem.z;

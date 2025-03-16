@@ -1,6 +1,7 @@
 package Main;
 import java.util.ArrayList;
 import java.util.List;
+
 import Geometria.*;
 import luminosidade.*;
 import Pipe.*;
@@ -12,7 +13,7 @@ public class Test {
     public static void main(String[] args) {
 		// Test.Pipeline();
         // Test.VisibilidadePorNormal();
-        // Test.Buffer();
+        Test.Buffer();
         // Test.Lightning();
     }
 
@@ -48,12 +49,18 @@ public class Test {
 
 	public static void Buffer() {
 		Point3D a = new Point3D(93, 251, -22.807);
-		Point3D b = new Point3D(125, 107, -21.815);
+		Point3D b = new Point3D(198, 241, -20.129);
+		Point3D d = new Point3D(85, 192, -32.570);
+		Point3D e = new Point3D(125, 107, -21.815);
 		Aresta aresta = new Aresta(a, b);
-		System.out.println("=========TESTE ARESTA=========");
-		System.out.println(aresta);
+		Aresta aresta2 = new Aresta(b, e);
+		Aresta aresta3 = new Aresta(e, a);
 		System.out.println("=========TESTE BUFFER ARESTA=========");
-		ZBuffer.varrerAresta(aresta);
+		List<Aresta> arestas = new ArrayList<>();
+		arestas.add(aresta);
+		arestas.add(aresta2);
+		arestas.add(aresta3);
+		ZBuffer.varrerArestas(arestas);
 	}
 
 	public static void Lightning() {
@@ -77,22 +84,22 @@ public class Test {
 	}
 	
 	public static void Recorte() {
-		Cut viewport = new Cut(100, 400, 80, 380);
-		Cut.Vertice a = new Cut.Vertice(0, 250, -30, 200, 120, 30);
-		Cut.Vertice b = new Cut.Vertice(250, 430, -65, 40, 250, 100);
-		Cut.Vertice c = new Cut.Vertice(480, 0, -90, 100, 10, 190);
+		// Cut viewport = new Cut(100, 400, 80, 380);
+		// Cut.Vertice a = new Cut.Vertice(0, 250, -30, 200, 120, 30);
+		// Cut.Vertice b = new Cut.Vertice(250, 430, -65, 40, 250, 100);
+		// Cut.Vertice c = new Cut.Vertice(480, 0, -90, 100, 10, 190);
 
-		List<Cut.Vertice> poligono = new ArrayList<>();
-		poligono.add(a);
-		poligono.add(b);
-		poligono.add(c);
+		// List<Cut.Vertice> poligono = new ArrayList<>();
+		// poligono.add(a);
+		// poligono.add(b);
+		// poligono.add(c);
 
-		System.out.println("=========TESTE RECORTE=========");
-		List<Cut.Vertice> resultado = viewport.recortarPoligono(poligono);
+		// System.out.println("=========TESTE RECORTE=========");
+		// List<Cut.Vertice> resultado = viewport.recortarPoligono(poligono);
 
-		System.out.println("\nResultado final tem " + resultado.size() + " vértices");
-		for (Cut.Vertice v : resultado) {
-			System.out.println(v);
-		}
+		// System.out.println("\nResultado final tem " + resultado.size() + " vértices");
+		// for (Cut.Vertice v : resultado) {
+		// 	System.out.println(v);
+		// }
 	}
 }

@@ -1,6 +1,7 @@
 package Pipe;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import Geometria.*;
 
@@ -40,16 +41,35 @@ public class ZBuffer {
         }
         
         for (Face face : faces) {
-            for (Aresta aresta : face.arestas) {
-                varrerAresta(aresta);
-            }
+            varrerArestas(face.arestas);
         }
     }
 
-    public static List<List<Double>> varrerAresta(Aresta aresta){        
-        int yMin = aresta.yMin;
-        int yMax = aresta.yMax;
+    public static void varrerArestas(List<Aresta> arestas) {
+        Optional<Aresta> arestaMenorY = arestas.stream()
+            .min((a1, a2) -> Integer.compare(a1.yMin, a2.yMin));
+        Optional<Aresta> arestaMaiorY = arestas.stream()
+            .max((a1, a2) -> Integer.compare(a1.yMax, a2.yMax));
+
+        int yMin = arestaMenorY.get().yMin;
+        int yMax = arestaMaiorY.get().yMax;
         int height = yMax - yMin + 1;
+
+        arestas = arestas.stream()
+        .sorted((a1, a2) -> {
+            int cmpY = Integer.compare(a1.yMin, a2.yMin);
+            if (cmpY == 0) {  // Se yMin for igual, desempate pelo x inicial
+                int cmpX = Double.compare(a1.origem.x, a2.origem.x);
+                if (cmpX == 0) {  // Se x for igual, desempate pelo Tx (menor Tx vem primeiro)
+                    return Double.compare(a1.tx, a2.tx);
+                }
+                return cmpX;
+            }
+            return cmpY;
+        })
+        .toList();
+
+        // Se após ordenado tiverem arestas com o mesmo x, ordenar só elas para que a que tiver o menor tX fique na frente (menor ao maior)
 
         List<List<Double>> scanlines = new ArrayList<>();
         List<List<Double>> zBuffer = new ArrayList<>();
@@ -58,32 +78,52 @@ public class ZBuffer {
             scanlines.add(new ArrayList<>());
             zBuffer.add(new ArrayList<>());
         }
-
-        if (aresta.origem.y == aresta.destino.y) return null;
-
-        double deltaX = (aresta.destino.x - aresta.origem.x) / (aresta.destino.y - aresta.origem.y);
-        double xInterseccao = aresta.origem.x;
-        double zAnterior = 0;
-
-        for (int y = (int)Math.ceil(aresta.origem.y); y < (int) Math.ceil(aresta.destino.y); y++){
-            int scanlineIndex = y - aresta.yMin;
-            scanlines.get(scanlineIndex).add(xInterseccao);
+        
+        for (int i = yMin; i < yMax; i++) {
+            final int currentY = i;
             
-            if(y == (int)Math.ceil(aresta.origem.y)) {
-                zAnterior = aresta.origem.z;
+            List<Aresta> arestasAtivas = arestas.stream()
+            .filter(a -> a.yMin <= currentY && a.yMax > currentY)
+            .toList();
+            
+            double currentX1 = (arestasAtivas.get(0).x);
+            double currentX2 = (arestasAtivas.get(1).x);
+            double currentZ1 = arestasAtivas.get(0).z;
+            double currentZ2 = arestasAtivas.get(1).z;
+
+            double denominador = currentX2 - currentX1;
+            double numerador = currentZ2 - currentZ1;
+
+            double tz;
+
+            if (denominador == 0 || numerador == 0) {
+                tz = 0;
             } else {
-                zAnterior = zAnterior + aresta.tz;
+                tz = numerador / denominador;
             }
-           zBuffer.get(scanlineIndex).add(zAnterior);
-            xInterseccao += deltaX;
+
+            // System.out.println(arestasAtivas.get(0).x + " " + arestasAtivas.get(1).x);
+            // System.out.println(arestasAtivas.get(0).z + " " + arestasAtivas.get(1).z);
+            
+            // System.out.println("Xi: " + currentX1 + " Xf: " + currentX2 + " Tz: " + tz);
+            
+            zBuffer.get(i - yMin).add(currentZ1 + (Math.ceil(currentX1) - arestasAtivas.get(0).x) * tz);
+
+            for (int j = 0; j < Math.floor(currentX2) - Math.ceil(currentX1); j++) {
+                double ultimo = zBuffer.get(i - yMin).get(zBuffer.get(i - yMin).size() - 1);
+                zBuffer.get(i - yMin).add(ultimo + tz);
+
+                // System.out.println(ultimo + tz);
+            }
+            // System.out.println(currentZ1 + " + " + (Math.ceil(currentX1) - arestasAtivas.get(0).x) + " * " + tz);
+            System.out.println(zBuffer.get(i - yMin));
+            // System.out.println("");
+
+            arestasAtivas.get(0).x += arestasAtivas.get(0).tx;
+            arestasAtivas.get(1).x += arestasAtivas.get(1).tx;
+
+            arestasAtivas.get(0).z += arestasAtivas.get(0).tz;
+            arestasAtivas.get(1).z += arestasAtivas.get(1).tz;
         }
-
-        for(int i = 0; i < scanlines.size(); i++){
-            System.out.println(scanlines.get(i));
-            System.out.println(zBuffer.get(i));
-        }
-
-        return zBuffer;
-
     }
 }
