@@ -36,6 +36,19 @@ public class Canvas extends JPanel {
     private Map<String, Surface> surfaceMap = new HashMap<>();
     private Map<String, Settings> settingsMap = new HashMap<>();
 
+
+    public Canvas(int width, int height, Settings settings, Surface superficie) {
+        this.settings = settings;
+        this.superficie = superficie;
+        image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
+        fillWhite();  // Garante que a tela comece branca
+
+        // Garantir que a janela de configurações seja aberta apenas uma vez
+        if (!configOpened) {
+            configOpened = true;
+        }
+    }
+
     public void openSurfaceManager() {
         surfacesFrame = new JFrame("Gerenciador de Superfícies");
         surfacesFrame.setSize(400, 500);
@@ -197,18 +210,6 @@ public class Canvas extends JPanel {
         openConfigurations();
     }
 
-    public Canvas(int width, int height, Settings settings, Surface superficie) {
-        this.settings = settings;
-        this.superficie = superficie;
-        image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
-        fillWhite();  // Garante que a tela comece branca
-
-        // Garantir que a janela de configurações seja aberta apenas uma vez
-        if (!configOpened) {
-            configOpened = true;
-        }
-    }
-
     public void iniciarComGerenciador() {
         SwingUtilities.invokeLater(this::openSurfaceManager);
     }
@@ -216,7 +217,7 @@ public class Canvas extends JPanel {
     private void fillWhite() {
         Graphics2D g2d = image.createGraphics();
         g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, settings.width, settings.height);
+        g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
         g2d.dispose();
     }
 
@@ -226,7 +227,7 @@ public class Canvas extends JPanel {
             for (Point2D point : pontos) {
                 int px = (int) Math.round(point.x);
                 int py = (int) Math.round(point.y);
-                if (px >= 0 && px < settings.width && py >= 0 && py < settings.height) {
+                if (px >= 0 && px < image.getWidth() && py >= 0 && py < image.getHeight()) {
                     image.setRGB(px, py, Color.BLACK.getRGB());
                 }
             }
@@ -386,28 +387,16 @@ public class Canvas extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
 
-        // Seção Tela
-        mainPanel.add(new JLabel("Tela"), gbc);
-        gbc.gridy++;
-        mainPanel.add(InterfaceInputs.createIntegerInputRow("W:", settings.width, "H:", settings.height,
-                newWidth -> settings.width = newWidth,
-                newHeight -> settings.height = newHeight), gbc);
-
-        // Seção Viewport
         gbc.gridy++;
         mainPanel.add(new JLabel("Viewport"), gbc);
-        gbc.gridy++;
-        mainPanel.add(InterfaceInputs.createIntegerInputRow("W:", settings.widthViewport, "H:", settings.heightViewport,
-                newWidth -> settings.widthViewport = newWidth,
-                newHeight -> settings.heightViewport = newHeight), gbc);
         gbc.gridy++;
         mainPanel.add(InterfaceInputs.createIntegerInputRow("uMin:", settings.viewport.umin, "uMax:", settings.viewport.umax,
                 newUmin -> settings.viewport.umin = newUmin,
                 newUmax -> settings.viewport.umax = newUmax), gbc);
         gbc.gridy++;
         mainPanel.add(InterfaceInputs.createIntegerInputRow("vMin:", settings.viewport.vmin, "vMax:", settings.viewport.vmax,
-                newVmin -> settings.viewport.umin = newVmin,
-                newVmax -> settings.viewport.umax = newVmax), gbc);
+                newVmin -> settings.viewport.vmin = newVmin,
+                newVmax -> settings.viewport.vmax = newVmax), gbc);
 
         // Seção Window
         gbc.gridy++;
@@ -661,8 +650,21 @@ public class Canvas extends JPanel {
 
         saveButton.addActionListener(e -> {
             if (settings.viewport.umax != image.getWidth() || settings.viewport.vmax != image.getHeight()) {
-//                image = new BufferedImage(settings.viewport.umax, settings.viewport.vmax, BufferedImage.TYPE_INT_RGB);
-//                fillWhite();  // Garante que a tela comece branca
+                System.out.println("Viewport size changed, updating image");
+                System.out.println("Old size: " + image.getWidth() + "x" + image.getHeight());
+                System.out.println("New size: " + settings.viewport.umax + "x" + settings.viewport.vmax);
+                image = new BufferedImage(settings.viewport.umax, settings.viewport.vmax, BufferedImage.TYPE_INT_RGB);
+                fillWhite();  // Garante que a tela comece branca
+
+                if (frame != null) {
+                    frame.setSize(settings.viewport.umax, settings.viewport.vmax);
+                }
+
+                // Set the preferred size of the Canvas component
+                setPreferredSize(new Dimension(settings.viewport.umax, settings.viewport.vmax));
+
+                // If we're in a scroll pane, we need to revalidate
+                revalidate();
             }
 
             try {
@@ -710,7 +712,7 @@ public class Canvas extends JPanel {
                 if(frame == null){
                     frame = new JFrame("Modelador de Superfícies B-Spline");
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    frame.setSize(settings.width, settings.height);
+                    frame.setSize(settings.viewport.umax, settings.viewport.vmax);
                     frame.add(Canvas.this);
                     frame.setVisible(true);
                 }
@@ -809,7 +811,6 @@ public class Canvas extends JPanel {
 
                 // Atualizar a exibição
                 repaint();
-
             } catch (NumberFormatException err) {
                 JOptionPane.showMessageDialog(configFrame, "Erro ao processar valores numéricos");
             }
@@ -825,7 +826,7 @@ public class Canvas extends JPanel {
         if(frame == null){
             frame = new JFrame("Modelador de Superfícies B-Spline");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(settings.width, settings.height);
+            frame.setSize(settings.viewport.umax, settings.viewport.vmax);
             frame.add(this);
             frame.setVisible(true);
         }

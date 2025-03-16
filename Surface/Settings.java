@@ -8,10 +8,6 @@ import Sombreamento.*;
 import Main.*;
 public class Settings implements Serializable {
     private static final long serialVersionUID = 1L;
-    public int width;
-    public int height;
-    public int widthViewport;
-    public int heightViewport;
     public int resolutionI, resolutionJ;
     public Viewport viewport;
     public Window window;
@@ -37,10 +33,6 @@ public class Settings implements Serializable {
     public double kn;
 
     public Settings() {
-        this.width = 800;
-        this.height = 800;
-        this.widthViewport = 1200;
-        this.heightViewport = 1200;
         this.viewport = new Viewport(0, 629, 0, 439);
         this.window = new Window(-64, 64, -48, 48);
         this.cameraPos = new Point3D(25, 15, 80);
