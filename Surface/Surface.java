@@ -42,9 +42,9 @@ public class Surface implements Serializable {
     }
 
     public void GerarSuperficie() {
-        if (this.m < 4 || this.n < 4 || this.m > 100 || this.n > 100) {
-            return;
-        }
+//        if (this.m < 4 || this.n < 4 || this.m > 100 || this.n > 100) {
+//            return;
+//        }
 
         for(int i = 0; i <= this.m; i++) {
             for(int j = 0; j <= this.n; j++) {
@@ -85,13 +85,13 @@ public class Surface implements Serializable {
         );
     
         double h = Math.abs(centroide.x) / Math.cos(Math.atan(Math.abs(centroide.y) / Math.abs(centroide.x)));
-        //double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
+        double d = Math.abs(centroide.z) / Math.cos(Math.atan(h / Math.abs(centroide.z)));
 
-        double d = Math.sqrt(
-            Math.pow(this.settings.cameraPos.x - centroide.x, 2) +
-            Math.pow(this.settings.cameraPos.y - centroide.y, 2) +
-            Math.pow(this.settings.cameraPos.z - centroide.z, 2)
-        );
+//        double d = Math.sqrt(
+//            Math.pow(this.settings.cameraPos.x - centroide.x, 2) +
+//            Math.pow(this.settings.cameraPos.y - centroide.y, 2) +
+//            Math.pow(this.settings.cameraPos.z - centroide.z, 2)
+//        );
 
         Aresta AB = new Aresta(A, B);
         Aresta BC = new Aresta(B, C);
@@ -151,6 +151,7 @@ public class Surface implements Serializable {
     public void UpdateSurfaceOutput() {
         int TI = 3;
         int TJ = 3;
+        int i, j, ki, kj;
     
         // CORRIGIDO: Usar this.m para knotsI, não this.m
         double[] knotsI = new double[this.m + TI + 1];
@@ -169,13 +170,13 @@ public class Surface implements Serializable {
         curve.SplineKnots(knotsJ, this.n, TJ);
     
         intervalI = 0;
-        for (int i = 0; i < this.RESOLUTIONI - 1; i++) {
+        for (i = 0; i < this.RESOLUTIONI - 1; i++) {
             intervalJ = 0;
-            for (int j = 0; j < this.RESOLUTIONJ - 1; j++) {
+            for (j = 0; j < this.RESOLUTIONJ - 1; j++) {
                 this.outp[i][j] = new Point3D(0, 0, 0);
     
-                for (int ki = 0; ki <= this.m; ki++) { // Usar this.m
-                    for (int kj = 0; kj <= this.n; kj++) {
+                for (ki = 0; ki <= this.m; ki++) { // Usar this.m
+                    for (kj = 0; kj <= this.n; kj++) {
                         bi = curve.SplineBlend(ki, TI, knotsI, intervalI);
                         bj = curve.SplineBlend(kj, TJ, knotsJ, intervalJ);
                         this.outp[i][j].x += this.inp[ki][kj].x * bi * bj; // Usar this.inp
@@ -190,10 +191,11 @@ public class Surface implements Serializable {
     
         // CORRIGIDO: Ajustar também para bordas
         intervalI = 0;
-        for (int i = 0; i < this.RESOLUTIONI - 1; i++) {
+
+        for (i = 0; i < this.RESOLUTIONI - 1; i++) {
             this.outp[i][this.RESOLUTIONJ - 1] = new Point3D(0, 0, 0);
     
-            for (int ki = 0; ki <= this.m; ki++) { // Usar this.m
+            for (ki = 0; ki <= this.m; ki++) { // Usar this.m
                 bi = curve.SplineBlend(ki, TI, knotsI, intervalI);
                 this.outp[i][this.RESOLUTIONJ - 1].x += this.inp[ki][this.n].x * bi;
                 this.outp[i][this.RESOLUTIONJ - 1].y += this.inp[ki][this.n].y * bi;
@@ -203,13 +205,13 @@ public class Surface implements Serializable {
         }
     
         // CORRIGIDO: Último ponto
-        this.outp[this.RESOLUTIONI - 1][this.RESOLUTIONJ - 1] = this.inp[this.m][this.n];
+        this.outp[i][this.RESOLUTIONJ - 1] = this.inp[this.m][this.n];
         intervalJ = 0;
-    
-        for (int j = 0; j < this.RESOLUTIONJ - 1; j++) {
+
+        for (j = 0; j < this.RESOLUTIONJ - 1; j++) {
             this.outp[this.RESOLUTIONI - 1][j] = new Point3D(0, 0, 0);
     
-            for (int kj = 0; kj <= this.n; kj++) {
+            for (kj = 0; kj <= this.n; kj++) {
                 bj = curve.SplineBlend(kj, TJ, knotsJ, intervalJ);
                 this.outp[this.RESOLUTIONI - 1][j].x += this.inp[this.m][kj].x * bj;
                 this.outp[this.RESOLUTIONI - 1][j].y += this.inp[this.m][kj].y * bj;
@@ -217,6 +219,7 @@ public class Surface implements Serializable {
             }
             intervalJ += incrementJ;
         }
+        this.outp[this.RESOLUTIONI - 1][j] = this.inp[this.m][this.n];
     
         this.updateReferences();
     }

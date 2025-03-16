@@ -701,48 +701,77 @@ public class Canvas extends JPanel {
                     superf.Translate(config.transform.x, config.transform.y, config.transform.z);
                     superf.Rotate(config.rotation.x, config.rotation.y, config.rotation.z);
                     superf.Scale(config.scale);
-                    
+
                     // Mapear pontos 3D para 2D para ESTA superfície específica
                     List<Point2D> pontosDaSuperficie = new ArrayList<>();
-                    for(int i = 0; i < superf.outp.length; i++){
-                        for(int j = 0; j < superf.outp[i].length; j++){
-                            Point2D ponto2D = Pipeline.mapearPonto(superf.outp[i][j], 
-                                             config.pontoFocal, config.cameraPos, vp);
+                    for (int i = 0; i < superf.outp.length; i++) {
+                        for (int j = 0; j < superf.outp[i].length; j++) {
+                            Point2D ponto2D = Pipeline.mapearPonto(superf.outp[i][j],
+                                    config.pontoFocal, config.cameraPos, vp);
                             pontosDaSuperficie.add(ponto2D);
                         }
                     }
-                    
+
                     // Renderizar esta superfície específica
                     Graphics g = image.getGraphics();
                     Cut cut = new Cut(settings.viewport.umin, settings.viewport.umax, settings.viewport.vmin, settings.viewport.vmax);
-                    
-                    // Usar diretamente os pontos da superfície, modificando apenas a abordagem de recorte
-                    // boolean algumPontoVisivel = false;
-                    
-                    // // Verificar se algum ponto está dentro da viewport
-                    // for (Point2D ponto : pontosDaSuperficie) {
-                    //     if (ponto.x >= settings.viewport.umin && ponto.x <= settings.viewport.umax &&
-                    //         ponto.y >= settings.viewport.vmin && ponto.y <= settings.viewport.vmax) {
-                    //         algumPontoVisivel = true;
-                    //         break;
-                    //     }
-                    // }
-                    
-                    // Em vez de tentar recortar cada face individualmente (o que é complexo),
-                    // vamos deixar que o Pintor use o recorte linha a linha que é mais eficiente
-                    boolean algumPontoVisivel = false;
-                    if (algumPontoVisivel) {
-                        // Adicionar logs para debug
-                        System.out.println("Renderizando superfície com pontos visíveis");
-                        System.out.println("Viewport: [" + settings.viewport.umin + ", " + settings.viewport.umax + 
-                                         "] x [" + settings.viewport.vmin + ", " + settings.viewport.vmax + "]");
-                        
-                        // Usar o Pintor diretamente com os pontos da superfície e deixar
-                        // que ele faça o recorte linha a linha, que é geralmente mais eficiente
+                    List<Point2D> pontosRecortados = new ArrayList<>();
+
+                    int numCols = superf.outp[0].length;
+                    for (Face face : superf.faces) {
+                        // Obter os índices dos vértices da face
+                        int i = face.i;
+                        int j = face.j;
+
+                        // Obter os pontos 2D correspondentes
+                        int idxA = i * numCols + j;
+                        int idxB = i * numCols + (j + 1);
+                        int idxC = (i + 1) * numCols + (j + 1);
+                        int idxD = (i + 1) * numCols + j;
+
+                        // Verificar se os índices estão dentro dos limites
+                        if (idxA < pontosDaSuperficie.size() &&
+                                idxB < pontosDaSuperficie.size() &&
+                                idxC < pontosDaSuperficie.size() &&
+                                idxD < pontosDaSuperficie.size()) {
+
+                            // Obter os pontos 2D da face
+                            Point2D p1 = pontosDaSuperficie.get(idxA);
+                            Point2D p2 = pontosDaSuperficie.get(idxB);
+                            Point2D p3 = pontosDaSuperficie.get(idxC);
+                            Point2D p4 = pontosDaSuperficie.get(idxD);
+
+                            // Recortar a face (quadrilátero)
+                            List<Cut.Vertice> poligonoParaRecortar = new ArrayList<>();
+
+                            // Converter cada ponto 2D para um vértice do recortador
+                            // Supondo que Cut.Vertice aceite (x, y, z, r, g, b) como parâmetros
+                            poligonoParaRecortar.add(new Cut.Vertice(p1.x, p1.y, p1.z, 0, 0, 0));
+                            poligonoParaRecortar.add(new Cut.Vertice(p2.x, p2.y, p2.z, 0, 0, 0));
+                            poligonoParaRecortar.add(new Cut.Vertice(p3.x, p3.y, p3.z, 0, 0, 0));
+                            poligonoParaRecortar.add(new Cut.Vertice(p4.x, p4.y, p4.z, 0, 0, 0));
+
+                            // Recortar o polígono
+                            List<Cut.Vertice> verticesRecortados = cut.recortarPoligono(poligonoParaRecortar);
+
+                            // Converter vértices recortados de volta para Point2D
+                            if (verticesRecortados != null && !verticesRecortados.isEmpty()) {
+                                for (Cut.Vertice v : verticesRecortados) {
+                                    pontosRecortados.add(new Point2D(v.x, v.y));
+                                }
+                            }
+
+                        }
+                    }
+
+                    // Usar os pontos recortados para renderizar
+                    if (!pontosRecortados.isEmpty()) {
+//                        Pintor.pintor(g, pontosRecortados, superf);
                         Pintor.pintor(g, pontosDaSuperficie, superf);
                     } else {
-                        Pintor.pintor(g, pontosDaSuperficie, superf);
-                        System.out.println("Nenhum ponto visível dentro da viewport");
+                        // Caso não haja pontos visíveis após o recorte
+//                         Pintor.pintor(g, pontosDaSuperficie, superf);
+                        System.out.println("Nenhum ponto visível após o recorte");
                     }
                 }
                 

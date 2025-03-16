@@ -19,10 +19,12 @@ public class Pipeline implements Serializable{
 
         Point3D novoPonto = Utils.multiplicarMatrizPorPonto(msrusrt, vertex);
         Point2D ponto2D = new Point2D(novoPonto.x, novoPonto.y);
+        ponto2D.z = novoPonto.z;
 
         if (ponto2D.h != 1) {
             ponto2D.x = ponto2D.x / ponto2D.h;
             ponto2D.y = ponto2D.y / ponto2D.h;
+            ponto2D.z = ponto2D.z / ponto2D.h;
             // ponto2D.y *= -1;
             ponto2D.h = 1;
         }
@@ -57,7 +59,7 @@ public class Pipeline implements Serializable{
             {1, 0, 0, 0},
             {0, 1, 0, 0},
             {0, 0, 1, 0},
-            {0, 0, 1 / d, 0}
+            {0, 0, -(1 / d), 0}
         };
     }
 

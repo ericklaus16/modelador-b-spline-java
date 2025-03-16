@@ -129,7 +129,5 @@ public class Pintor {
         }
 
         // Zbuffer
-    }
-
-   
+    } 
 }

@@ -42,8 +42,8 @@ public class Settings implements Serializable {
         this.viewport = new Viewport(0, 629, 0, 439, -64, 64, -48, 48);
         this.cameraPos = new Point3D(25, 15, 80);
         this.pontoFocal = new Point3D(20, 10, 25);
-        this.m = 4;
-        this.n = 4;
+        this.m = 2;
+        this.n = 2;
         this.transform = new Point3D(0.0, 0.0, 0.0);
         this.rotation = new Point3D(0.0, 0.0, 0.0);
         this.scale = 1.0;

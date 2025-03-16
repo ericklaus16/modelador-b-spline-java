@@ -16,7 +16,7 @@ public class Visibility {
 
     public static double CalcularVisibilidade(Point3D o, Point3D n) {
         double visibilidade = Point3D.dotProduct(o, n);
-        System.out.println("Visibilidade: " + visibilidade);
+//        System.out.println("Visibilidade: " + visibilidade);
         return visibilidade;
     }
 

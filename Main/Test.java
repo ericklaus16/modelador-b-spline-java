@@ -10,10 +10,11 @@ public class Test {
     Test(){};
 
     public static void main(String[] args) {
-		// Test.Pipeline();
+//		 Test.Pipeline();
         // Test.VisibilidadePorNormal();
-        Test.Buffer();
+//        Test.Buffer();
         // Test.Lightning();
+		Test.Recorte();
     }
 
 	public static void Pipeline() {
@@ -22,8 +23,9 @@ public class Test {
 		Point3D p = new Point3D(20, 10, 25);
         Viewport viewport = new Viewport(0, 319, 0, 239, -20, 20, -15, 15);
 		Point3D vertex = new Point3D(21.2, 0.7, 42.3, 1);
-		Point2D novoPonto = Pipeline.mapearPonto(vertex, p, vrp, viewport);
-		System.out.println(novoPonto.x + " " + novoPonto.y);
+		Point3D b = new Point3D(34.1, 3.4, 27.2,1);
+		Point2D novoPonto = Pipeline.mapearPonto(b, p, vrp, viewport);
+		System.out.println(novoPonto.x + " " + novoPonto.y + " " + novoPonto.z);
 	}
 
 	public static void VisibilidadePorNormal() {
@@ -80,7 +82,7 @@ public class Test {
 		arestas.add(aresta4);
 		arestas.add(aresta5);
 		arestas.add(aresta6);
-		ZBuffer.varrerArestas(arestas);
+//		ZBuffer.varrerArestas(arestas);
 	}
 
 	public static void Lightning() {
@@ -103,22 +105,61 @@ public class Test {
 	}
 	
 	public static void Recorte() {
-		// Cut viewport = new Cut(100, 400, 80, 380);
-		// Cut.Vertice a = new Cut.Vertice(0, 250, -30, 200, 120, 30);
-		// Cut.Vertice b = new Cut.Vertice(250, 430, -65, 40, 250, 100);
-		// Cut.Vertice c = new Cut.Vertice(480, 0, -90, 100, 10, 190);
+		System.out.println("=========TESTE RECORTE COM PIPELINE=========");
 
-		// List<Cut.Vertice> poligono = new ArrayList<>();
-		// poligono.add(a);
-		// poligono.add(b);
-		// poligono.add(c);
+		// Parâmetros de visualização
+		Point3D vrp = new Point3D(25, 15, 80);
+		Point3D p = new Point3D(20, 10, 25);
+		double dp = 40; // Distância para projeção
 
-		// System.out.println("=========TESTE RECORTE=========");
-		// List<Cut.Vertice> resultado = viewport.recortarPoligono(poligono);
+		// Viewport e Window
+		Viewport viewport = new Viewport(0, 319, 0, 239, -8, 8, -6, 6);
 
-		// System.out.println("\nResultado final tem " + resultado.size() + " vértices");
-		// for (Cut.Vertice v : resultado) {
-		// 	System.out.println(v);
-		// }
+		// Pontos 3D originais
+		Point3D pontoA = new Point3D(21.2, 0.7, 42.3);
+		Point3D pontoB = new Point3D(34.1, 3.4, 27.2);
+		Point3D pontoC = new Point3D(18.8, 5.6, 14.6); // Será mapeado mas não usado no recorte
+		Point3D pontoD = new Point3D(5.9, 2.9, 29.7);
+		Point3D pontoE = new Point3D(20, 20.9, 31.6);
+
+		// Exibir pontos 3D
+		System.out.println("\nPontos 3D originais:");
+		System.out.println("A: (" + pontoA.x + ", " + pontoA.y + ", " + pontoA.z + ")");
+		System.out.println("B: (" + pontoB.x + ", " + pontoB.y + ", " + pontoB.z + ")");
+		System.out.println("C: (" + pontoC.x + ", " + pontoC.y + ", " + pontoC.z + ")");
+		System.out.println("D: (" + pontoD.x + ", " + pontoD.y + ", " + pontoD.z + ")");
+		System.out.println("E: (" + pontoE.x + ", " + pontoE.y + ", " + pontoE.z + ")");
+
+		// Mapear todos os pontos individualmente
+		Point2D pontoA2D = Pipeline.mapearPonto(pontoA, p, vrp, viewport);
+		Point2D pontoB2D = Pipeline.mapearPonto(pontoB, p, vrp, viewport);
+		Point2D pontoC2D = Pipeline.mapearPonto(pontoC, p, vrp, viewport); // Mapeado mas não usado no recorte
+		Point2D pontoD2D = Pipeline.mapearPonto(pontoD, p, vrp, viewport);
+		Point2D pontoE2D = Pipeline.mapearPonto(pontoE, p, vrp, viewport);
+
+		// Exibir pontos após mapeamento
+		System.out.println("\nPontos após mapeamento (antes do recorte):");
+		System.out.println("A: (" + pontoA2D.x + ", " + pontoA2D.y + ")");
+		System.out.println("B: (" + pontoB2D.x + ", " + pontoB2D.y + ")");
+		System.out.println("C: (" + pontoC2D.x + ", " + pontoC2D.y + ")"); // Exibido para referência
+		System.out.println("D: (" + pontoD2D.x + ", " + pontoD2D.y + ")");
+		System.out.println("E: (" + pontoE2D.x + ", " + pontoE2D.y + ")");
+
+		// Criar uma lista com os pontos 3D que formarão o polígono para recorte (A, B, D, E)
+		List<Point2D> poligono2D = new ArrayList<>();
+		poligono2D.add(pontoD2D); // A
+		poligono2D.add(pontoA2D); // B
+//		poligono2D.add(pontoD2D); // D
+		poligono2D.add(pontoE2D); // E
+
+		// Aplicar recorte ao polígono
+		List<Point2D> poligonoRecortado = Cut.mapearERecorte(poligono2D, p, vrp, viewport);
+
+		// Exibir resultados após recorte
+		System.out.println("\nPolígono após recorte (" + poligonoRecortado.size() + " vértices):");
+		for (int i = 0; i < poligonoRecortado.size(); i++) {
+			Point2D pt = poligonoRecortado.get(i);
+			System.out.println("Ponto " + i + ": (" + pt.x + ", " + pt.y + ")");
+		}
 	}
 }
