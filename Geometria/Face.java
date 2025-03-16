@@ -2,6 +2,7 @@ package Geometria;
 import Pipe.*;
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,7 +17,7 @@ public class Face implements Serializable {
     public double visibilidade = 0;
     public int i;
     public int j;
-    public List<Aresta> arestas;
+    public List<Aresta> arestas = new ArrayList<>();
     public Point3D centroide = new Point3D(0, 0, 0);
     public Point3D normal = new Point3D(0, 0, 0);
     public Point3D o = new Point3D(0, 0, 0);
@@ -36,6 +37,12 @@ public class Face implements Serializable {
         this.d = d;
         this.i = i;
         this.j = j;
+        this.centroide = new Point3D (
+            (A.x + B.x + C.x + D.x) / 4,
+            (A.y + B.y + C.y + D.y) / 4,
+            (A.z + B.z + C.z + D.z) / 4,
+            1
+        );
 
         setNormal();
         setO(vrp);

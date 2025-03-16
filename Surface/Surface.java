@@ -19,6 +19,8 @@ public class Surface implements Serializable {
     public int RESOLUTIONJ;
     public Point3D[][] inp;
     public Point3D[][] outp;
+    public Color[][] colorBuffer;
+    public double[][] zBuffer;
     public Point3D[][] inpScaleReference;
     public Point3D[][] outpScaleReference;
     public List<Face> faces = new ArrayList<>();
@@ -90,12 +92,23 @@ public class Surface implements Serializable {
             Math.pow(this.settings.cameraPos.y - centroide.y, 2) +
             Math.pow(this.settings.cameraPos.z - centroide.z, 2)
         );
+
+        Aresta AB = new Aresta(A, B);
+        Aresta BC = new Aresta(B, C);
+        Aresta CD = new Aresta(C, D);
+        Aresta DA = new Aresta(D, A);
     
         // if(d < this.settings.near || d > this.settings.far) {
         //     return null;
         // }
-        
-        return new Face(A, B, C, D, d, i, j, this.settings.cameraPos);
+
+        Face face = new Face(A, B, C, D, d, i, j, this.settings.cameraPos);
+        face.arestas.add(AB);
+        face.arestas.add(BC);
+        face.arestas.add(CD);
+        face.arestas.add(DA);
+
+        return face;
     }
 
     // Método adicional que pode ser útil na classe Surface

@@ -2,10 +2,9 @@ package Main;
 import java.util.ArrayList;
 import java.util.List;
 
-import Geometria.*;
 import luminosidade.*;
 import Pipe.*;
-
+import Geometria.*;
 
 public class Test {
     Test(){};
@@ -52,14 +51,35 @@ public class Test {
 		Point3D b = new Point3D(198, 241, -20.129);
 		Point3D d = new Point3D(85, 192, -32.570);
 		Point3D e = new Point3D(125, 107, -21.815);
+
+		Point3D bLinha = new Point3D(319.000, 160.774, -51.524);
+		bLinha.it = 133.160;
+
+		Point3D bLinhaLinha = new Point3D(190.427, 0.000, -48.792);
+		bLinhaLinha.it = 118.411;
+
+		Point3D eLinhaLinha = new Point3D(149.864, 0.000, -46.762);
+		eLinhaLinha.it = 105.145;
+
+		Point3D eLinha = new Point3D(151.303, 239.000, -41.331);
+		eLinha.it = 65.034;
+
+		Point3D aLinhaLinha = new Point3D(319.000, 239.000, -49.722);
+		aLinhaLinha.it = 119.878;
+
 		Aresta aresta = new Aresta(a, b);
 		Aresta aresta2 = new Aresta(b, e);
 		Aresta aresta3 = new Aresta(e, a);
+
+		Aresta aresta4 = new Aresta(bLinha, bLinhaLinha);
+		Aresta aresta5 = new Aresta(eLinhaLinha, eLinha);
+		Aresta aresta6 = new Aresta(aLinhaLinha, bLinha);
+
 		System.out.println("=========TESTE BUFFER ARESTA=========");
 		List<Aresta> arestas = new ArrayList<>();
-		arestas.add(aresta);
-		arestas.add(aresta2);
-		arestas.add(aresta3);
+		arestas.add(aresta4);
+		arestas.add(aresta5);
+		arestas.add(aresta6);
 		ZBuffer.varrerArestas(arestas);
 	}
 
@@ -69,7 +89,6 @@ public class Test {
 		Point3D c = new Point3D(149.556, -51.107, -47.924);
 		Point3D d = new Point3D(0, 0, 0);
 		Face face = new Face(a, b, c, d, 0, 0, 0, new Point3D(25, 15, 80));
-		face.centroide = new Point3D(25.100, 8.333, 33.700);
 		face.normal = new Point3D(0.669, 0.378, 0.639);
 
 		double ila = 120;

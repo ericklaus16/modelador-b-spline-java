@@ -10,11 +10,14 @@ public class Aresta implements Serializable {
     public int yMax;
     public double x;
     public double z;
+    public double it;
     public double dx;
     public double dy;
     public double dz;
+    public double dit;
     public double tx;
     public double tz;
+    public double tit;
 
     public Aresta(Point3D origem, Point3D destino) {
         this.origem = origem;
@@ -33,7 +36,10 @@ public class Aresta implements Serializable {
         this.dx = this.destino.x - this.origem.x;
         this.dy = this.destino.y - this.origem.y;
         this.dz = this.destino.z - this.origem.z;
+        this.dit = this.destino.it - this.origem.it;
         this.tx = this.dx / this.dy;
         this.tz = this.dz / this.dy;
+        this.tit = this.dit / this.dy;
+        this.it = this.origem.it;
     }
 }

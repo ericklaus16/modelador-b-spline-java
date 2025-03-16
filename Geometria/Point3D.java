@@ -7,6 +7,7 @@ public class Point3D implements Serializable {
     public double y;
     public double z;
     public double h;
+    public double it = 0;
 
     public Point3D(double x, double y, double z) {
         this(x, y, z, 1);
