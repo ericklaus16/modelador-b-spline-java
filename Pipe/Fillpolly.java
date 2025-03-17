@@ -59,8 +59,10 @@ public class Fillpolly {
                 int xIni = (int) Math.ceil(intersecoes.get(i));
                 int xFim = (int) Math.floor(intersecoes.get(i + 1));
 
-                // Desenhar o preenchimento no canvas
-                g.fillRect(xIni, y, xFim - xIni, 1);
+                // Preencher pixel por pixel para evitar gaps
+                for (int x = xIni; x <= xFim; x++) {
+                    g.fillRect(x, y, 1, 1);
+                }
             }
         }
     }
