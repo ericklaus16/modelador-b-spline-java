@@ -83,26 +83,38 @@ public class Pintor {
 
                 Fillpolly.polyFill(g, face.corConstante, facePontos);
             }
-        } else if(superficie.settings.shader == Shader.Gouraud){
+        } else if (superficie.settings.shader == Shader.Gouraud) {
+            Gouraud.applyGouraudShader(superficie); // Forçar aplicação do shader
+
             for (Face face : superficie.faces) {
-                // Obter os pontos 2D projetados
-                if(face.visibilidade <= 0) continue;
+                if (face.visibilidade <= 0) continue;
+
+                // Verificar índices para evitar acesso inválido
+                int indexA = face.i * superficie.outp[0].length + face.j;
+                int indexB = face.i * superficie.outp[0].length + (face.j + 1);
+                int indexC = (face.i + 1) * superficie.outp[0].length + (face.j + 1);
+                int indexD = (face.i + 1) * superficie.outp[0].length + face.j;
+
+                // Validar se os índices estão dentro do tamanho da lista 'pontos'
+                if (indexA >= pontos.size() || indexB >= pontos.size() || indexC >= pontos.size() || indexD >= pontos.size()) {
+                    continue; // Ou tratar o erro adequadamente
+                }
+
                 List<Point2D> facePontos = List.of(
-                        pontos.get(face.i * superficie.outp[0].length + face.j),
-                        pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),
-                        pontos.get((face.i + 1) * superficie.outp[0].length + (face.j + 1)),
-                        pontos.get((face.i + 1) * superficie.outp[0].length + face.j)
+                        pontos.get(indexA),
+                        pontos.get(indexB),
+                        pontos.get(indexC),
+                        pontos.get(indexD)
                 );
 
-                // Obter as cores dos vértices
-                List<Color> faceCores = List.of(
-                        superficie.vertexColors.get(face.A),
-                        superficie.vertexColors.get(face.B),
-                        superficie.vertexColors.get(face.C),
-                        superficie.vertexColors.get(face.D)
+                // Verificar cores dos vértices (evitar null)
+                List<Color> faceCores = Arrays.asList(
+                        superficie.vertexColors.getOrDefault(face.A, Color.BLACK),
+                        superficie.vertexColors.getOrDefault(face.B, Color.BLACK),
+                        superficie.vertexColors.getOrDefault(face.C, Color.BLACK),
+                        superficie.vertexColors.getOrDefault(face.D, Color.BLACK)
                 );
 
-                // Chamar polyFill com interpolação de cores
                 Gouraud.polyFillGouraud(g, facePontos, faceCores);
             }
         }else if(superficie.settings.shader == Shader.Phong){
