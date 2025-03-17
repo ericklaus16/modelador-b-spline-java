@@ -29,19 +29,19 @@ public class Operacoes {
         
         rgb[0] = Lightning.Illuminate(
             face.centroide, face.normal,
-            settings.ila, settings.lampada.pos, settings.lampada.il,
+            settings.ila, settings.lampada.pos, settings.lampada.ilr,
             settings.kar, settings.kdr, settings.ksr, o
         );
         
         rgb[1] = Lightning.Illuminate(
             face.centroide, face.normal,
-            settings.ila, settings.lampada.pos, settings.lampada.il,
+            settings.ila, settings.lampada.pos, settings.lampada.ilg,
             settings.kag, settings.kdg, settings.ksg, o
         );
         
         rgb[2] = Lightning.Illuminate(
             face.centroide, face.normal,
-            settings.ila, settings.lampada.pos, settings.lampada.il,
+            settings.ila, settings.lampada.pos, settings.lampada.ilb,
             settings.kab, settings.kdb, settings.ksb, o
         );
         

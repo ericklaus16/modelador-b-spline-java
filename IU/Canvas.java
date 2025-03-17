@@ -532,8 +532,10 @@ public class Canvas extends JPanel {
         gbc.gridy++;
         mainPanel.add(new JLabel("Lâmpada"), gbc);
         gbc.gridy++;
-        mainPanel.add(InterfaceInputs.createInputRow("Il", settings.lampada.il,
-                newIl -> settings.lampada.il = newIl
+        mainPanel.add(InterfaceInputs.createTripleInputRow("Il", settings.lampada.ilr, settings.lampada.ilg, settings.lampada.ilb,
+                newIlr -> settings.lampada.ilr = newIlr,
+                newIlg -> settings.lampada.ilg = newIlg,
+                newIlb -> settings.lampada.ilb = newIlb
         ), gbc);
         gbc.gridy++;
         mainPanel.add(InterfaceInputs.createTripleInputRow("XYZ", settings.lampada.pos.x, settings.lampada.pos.y, settings.lampada.pos.z,

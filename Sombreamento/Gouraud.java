@@ -54,15 +54,15 @@ public class Gouraud {
                 s = Point3D.getNormalizedVector(s);
                 
                 double r = Lightning.Illuminate(vertex, normalizado,
-                        superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.il,
+                        superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.ilr,
                         superficie.settings.kar, superficie.settings.kdr, superficie.settings.ksr, s);
                 
                 double gr = Lightning.Illuminate(vertex, normalizado,
-                        superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.il,
+                        superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.ilg,
                         superficie.settings.kag, superficie.settings.kdg, superficie.settings.ksg, s);
                 
                 double b = Lightning.Illuminate(vertex, normalizado,
-                        superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.il,
+                        superficie.settings.ila, superficie.settings.lampada.pos, superficie.settings.lampada.ilb,
                         superficie.settings.kab, superficie.settings.kdb, superficie.settings.ksb, s);
                 
                 Color cor = new Color((float) r / 255, (float) gr / 255, (float) b / 255);
