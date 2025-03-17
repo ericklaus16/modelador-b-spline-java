@@ -74,6 +74,7 @@ public class Pintor {
             Wireframe.applyWireframeShader(g, pontos, superficie, superficie.outp[0].length);
         } else if(superficie.settings.shader == Shader.Constante){
             for (Face face : superficie.faces) {
+                if (face.visibilidade <= 0) continue;
                 List<Point2D> facePontos = List.of(
                         pontos.get(face.i * superficie.outp[0].length + face.j),
                         pontos.get(face.i * superficie.outp[0].length + (face.j + 1)),

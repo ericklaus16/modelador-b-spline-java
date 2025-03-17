@@ -88,7 +88,7 @@ public class Cut {
 //        System.out.println("");
 
         if (resultado.isEmpty()) {
-            System.out.println("Polígono completamente fora após recorte à esquerda");
+//            System.out.println("Polígono completamente fora após recorte à esquerda");
             return resultado;
         }
 
