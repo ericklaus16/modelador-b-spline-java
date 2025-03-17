@@ -1,0 +1,15 @@
+Discentes: 
+Eric Klaus Brenner Melo e Santos
+Matheus Rogério Pesarini
+Ruan Rubino de Carvalho
+
+Instruções de como rodar o projeto:
+Sistema Operacional: Qualquer um que possua Java disponível. O desenvolvimento foi feito no Windows.
+Linguagem: Java
+Versão: 17.0.12
+Bibiliotecas Necessárias: -
+Aplicativo(s) necessário(s): IDE que rode Java (Ex.: Eclipse, IntelliJ, VSCode, etc.) e Java
+
+Para rodar localmente, basta rodar o arquivo Main/Modelador.java.
+
+Observação: em caso do gmail impedir o envio do projeto, existe um repositório no github (https://github.com/ericklaus16/modelador-b-spline-java) onde o arquivo script.js pode ser baixado.
