@@ -493,6 +493,8 @@ public class Canvas extends JPanel {
             
             if(formattedValue.equals("1,0")){
                 settings.scale = 1;
+            } else if (formattedValue.equals("0,0")) {
+                settings.scale = 0;
             } else {
                 settings.scale = scaleValue;
             }
@@ -692,15 +694,22 @@ public class Canvas extends JPanel {
                     }
 
                     if(settings.m != superficie.m || settings.n != superficie.n){
-                        int resposta = JOptionPane.showConfirmDialog(configFrame, 
+                        if(settings.m < 4 || settings.m > 100 || settings.n < 4 || settings.n > 100){
+                            JOptionPane.showMessageDialog(configFrame,
+                                "Erro: m e n devem estar entre 4 e 100.",
+                                "Erro", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        int resposta = JOptionPane.showConfirmDialog(configFrame,
                             "Cuidado! Você alterou a matriz de pontos de controle! Isso gerará uma nova superfície.");
-        
+
                         if (resposta != JOptionPane.YES_OPTION) return;
-        
+
                         // Criar nova superfície com novos pontos de controle
                         Surface novaSuperf = new Surface(settings.m, settings.n);
                         superficie = novaSuperf;
-                        
+
                         // Atualizar o mapa
                         surfaceMap.put(surfaceAtualKey, novaSuperf);
                     }
@@ -736,6 +745,8 @@ public class Canvas extends JPanel {
                         superf.Translate(config.transform.x, config.transform.y, config.transform.z);
                         superf.Rotate(config.rotation.x, config.rotation.y, config.rotation.z);
                         superf.Scale(config.scale);
+
+                        superf.OpenCloseSurface();
                     }
 
                     // Mapear pontos 3D para 2D para ESTA superfície específica

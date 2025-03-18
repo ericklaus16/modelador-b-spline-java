@@ -44,6 +44,13 @@ public class Curve implements Serializable {
         return value;
     }
 
+    public void PeriodicSplineKnots(double[] knots, int n, int t) {
+        int m = n + t + 1;
+        for (int i = 0; i < m; i++) {
+            knots[i] = i; // Distribuição uniforme e periódica
+        }
+    }
+
     public void SplineKnots(double[] u, int n, int t) {
         for (int j = 0; j <= n + t; j++) {
             if (j < t) {

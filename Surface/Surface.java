@@ -9,6 +9,8 @@ import java.util.Map;
 
 import Geometria.*;
 
+import javax.swing.*;
+
 public class Surface implements Serializable {
     private static final long serialVersionUID = 1L;
     public Integer id;
@@ -18,6 +20,7 @@ public class Surface implements Serializable {
     public int RESOLUTIONI;
     public int RESOLUTIONJ;
     public Point3D[][] inp;
+    private Point3D[][] originalInp;
     public Point3D[][] outp;
     public Color[][] colorBuffer;
     public double[][] zBuffer;
@@ -26,7 +29,8 @@ public class Surface implements Serializable {
     public List<Face> faces = new ArrayList<>();
     public Settings settings = new Settings();
     public Map<Point3D, Color> vertexColors = new HashMap<>();
-    public double z ;
+    public double z;
+    boolean adicionou3PC = false;
 
     public Surface(int m, int n) {
         this.name = "";
@@ -42,10 +46,6 @@ public class Surface implements Serializable {
     }
 
     public void GerarSuperficie() {
-//        if (this.m < 4 || this.n < 4 || this.m > 100 || this.n > 100) {
-//            return;
-//        }
-
         for(int i = 0; i <= this.m; i++) {
             for(int j = 0; j <= this.n; j++) {
                 this.inp[i][j] = new Point3D(0, 0, 0);
@@ -128,7 +128,7 @@ public class Surface implements Serializable {
     }
 
     private void updateReferences() {
-		if(this.outp[0][0].x == 0 && this.outp[0][0].y == 0 && this.outp[0][0].z == 0) return;
+		// if(this.outp[0][0].x == 0 && this.outp[0][0].y == 0 && this.outp[0][0].z == 0) return;
 
         this.inpScaleReference = new Point3D[this.inp.length][this.inp[0].length];
         this.outpScaleReference = new Point3D[this.outp.length][this.outp[0].length];
@@ -166,8 +166,13 @@ public class Surface implements Serializable {
     
         Curve curve = new Curve();
     
-        curve.SplineKnots(knotsI, this.m, TI);
-        curve.SplineKnots(knotsJ, this.n, TJ);
+        if(settings.type == SurfaceType.Fechada){
+            curve.PeriodicSplineKnots(knotsI, this.m, TI);
+            curve.PeriodicSplineKnots(knotsJ, this.n, TJ);
+        } else {
+            curve.SplineKnots(knotsI, this.m, TI);
+            curve.SplineKnots(knotsJ, this.n, TJ);
+        }
     
         intervalI = 0;
         for (i = 0; i < this.RESOLUTIONI - 1; i++) {
@@ -222,6 +227,88 @@ public class Surface implements Serializable {
         this.outp[this.RESOLUTIONI - 1][j] = this.inp[this.m][this.n];
     
         this.updateReferences();
+    }
+
+    public void OpenCloseSurface(){
+        if(settings.type == SurfaceType.Fechada && !adicionou3PC){
+            // Guarda uma cópia limpa da superfície aberta original apenas na primeira vez
+            if(originalInp == null) {
+                originalInp = new Point3D[this.m + 1][this.n + 1];
+                for(int i = 0; i <= this.m; i++){
+                    for(int j = 0; j <= this.n; j++){
+                        originalInp[i][j] = new Point3D(
+                            this.inp[i][j].x, 
+                            this.inp[i][j].y,
+                            this.inp[i][j].z
+                        );
+                    }
+                }
+            }
+            
+            // Adicionar os 3 primeiros pontos de controle no final da superfície
+            Point3D[][] newInp = new Point3D[this.m + 4][this.n + 4];
+        
+            // Inicializa toda a matriz para evitar NullPointerException
+            for(int i = 0; i <= this.m + 3; i++){
+                for(int j = 0; j <= this.n + 3; j++){
+                    newInp[i][j] = new Point3D(0, 0, 0);
+                }
+            }
+            
+            // Copia os pontos de controle existentes
+            for(int i = 0; i <= this.m; i++){
+                for(int j = 0; j <= this.n; j++){
+                    newInp[i][j] = this.inp[i][j];
+                }
+            }
+            
+            // Adiciona os primeiros 3 pontos de controle no final
+            for(int i = 0; i < 3; i++){
+                for(int j = 0; j < 3; j++){
+                    newInp[this.m + 1 + i][this.n + 1 + j] = this.inp[i][j];
+                }
+            }
+            
+            this.inp = newInp;
+            this.m += 3;
+            this.n += 3;
+            settings.m = this.m;
+            settings.n = this.n;
+            this.adicionou3PC = true;
+            
+            // Recria completamente a saída
+            this.outp = new Point3D[this.RESOLUTIONI][this.RESOLUTIONJ];
+            for(int i = 0; i < this.RESOLUTIONI; i++) {
+                for(int j = 0; j < this.RESOLUTIONJ; j++) {
+                    this.outp[i][j] = new Point3D(0, 0, 0);
+                }
+            }
+            
+            UpdateSurfaceOutput();
+            this.inpScaleReference = null;
+            this.updateReferences();
+        } else if(settings.type == SurfaceType.Aberta && adicionou3PC){
+            if (originalInp != null) {
+                int originalM = originalInp.length - 1; // m original é inp.length - 1
+                int originalN = originalInp[0].length - 1;
+    
+                this.m = originalM;
+                this.n = originalN;
+                settings.m = originalM;
+                settings.n = originalN;
+    
+                this.inp = new Point3D[originalM + 1][originalN + 1];
+                for (int i = 0; i <= originalM; i++) {
+                    System.arraycopy(originalInp[i], 0, this.inp[i], 0, originalN + 1);
+                }
+    
+                this.adicionou3PC = false;
+                this.RESOLUTIONI = settings.resolutionI;
+                this.RESOLUTIONJ = settings.resolutionJ;
+                this.outp = new Point3D[RESOLUTIONI][RESOLUTIONJ];
+                UpdateSurfaceOutput(); // Forçar recálculo com knots abertos
+            }
+        }
     }
 
     public void Translate(double dx, double dy, double dz) {

@@ -246,7 +246,7 @@ public class InterfaceInputs {
             radioButton.addActionListener(e -> {
                 JRadioButton source = (JRadioButton) e.getSource();
                 if (source.isSelected()) {
-                    System.out.println(source.getText());
+//                    System.out.println(source.getText());
                     updateValue.accept(source.getText());
                 }
             });
